@@ -1,4 +1,4 @@
-package io.github.danielt3131.mipsemu;
+package io.github.danielt3131.mipsemu.machine;
 
 public class MipsMachine {
 
