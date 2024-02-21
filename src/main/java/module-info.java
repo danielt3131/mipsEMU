@@ -8,4 +8,6 @@ module io.github.danielt3131.mipsemu {
 
     opens io.github.danielt3131.mipsemu to javafx.fxml;
     exports io.github.danielt3131.mipsemu;
+    exports io.github.danielt3131.mipsemu.machine;
+    opens io.github.danielt3131.mipsemu.machine to javafx.fxml;
 }
