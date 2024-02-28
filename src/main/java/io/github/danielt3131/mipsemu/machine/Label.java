@@ -13,31 +13,17 @@
  */
 package io.github.danielt3131.mipsemu.machine;
 
-/**
- * A representation of a 4 byte mips word
- * Essentially an integer wrapper
- */
-
-public class Word
+public class Label
 {
 
-    int value;
+    protected String name;
+    protected int location;
 
-    /**
-     * Creates empty word
-     */
-    protected Word()
+    public Label(String name, int location)
     {
-
+        this.name = name;
+        this.location = location;
     }
 
-    /**
-     * Creates word with value
-     * @param value the value to make the word
-     */
-    protected Word(int value)
-    {
-        this.value = value;
-    }
 
 }
