@@ -15,6 +15,9 @@
 package io.github.danielt3131.mipsemu.machine;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * The mips emulator that will read a file written in MIPS and then execute those commands using virtual registers
@@ -32,7 +35,10 @@ public class MipsMachine {
     private int at, k0, k1, gp, fp, sp, ra; //specific-purpose registers $1, $26-$31
 
     //Machine memory
-    private byte[] memory;
+    private Word[] memory;
+
+    //labels
+    private ArrayList<Label> labels;
 
     //The file with mips instructions written
     private File file;
@@ -41,19 +47,88 @@ public class MipsMachine {
      * Constructor for the mips emulator
      * @param memorySize the amount of memory the machine will have in bytes
      */
-    public MipsMachine(int memorySize)
+    public MipsMachine(int memorySize) throws MemorySizeException
     {
-        memory = new byte[memorySize];
+        if(memorySize % 4 != 0)
+        {
+            throw new MemorySizeException("Memory must be multiple of 4 bytes");
+        }
+        memory = new Word[memorySize/4];
         pc = 0;
     }
 
     /**
      * Reads in a file and puts the instructions into memory
-     * @param file the mips file to read from
+     * @param fileDir the mips file location to read from
      */
-    public void readFile(File file)
+    public void readFile(String fileDir) throws FileNotFoundException
     {
-        //todo read in a file and put it into the memory
+
+        int tp = 0; //tp for text pointer : where to place word in text block of memory
+
+        file = new File(fileDir);
+        if(!file.exists() || !file.canRead())
+        {
+            throw new FileNotFoundException();
+        }
+
+        Scanner fileScanner = new Scanner(file);
+        Scanner lineScanner;
+
+        while(fileScanner.hasNextLine())
+        {
+            String line = fileScanner.nextLine();
+
+            //Ignore empty lines
+            if (line.isEmpty())
+            {
+                continue;
+            }
+
+            //Ignore comment lines
+            if (line.startsWith("#"))
+            {
+                continue;
+            }
+
+            //Now remove comments from end of line if it contains a comment
+            if(line.contains("#"))
+            {
+                line = line.substring(0,line.indexOf("#"));
+            }
+
+            //See if line is a label
+            if(line.endsWith(":"))
+            {
+                labels.add(new Label(line.substring(0,line.indexOf(":")),tp+1));
+                continue;
+            }
+
+            //Generate word from line
+            lineScanner = new Scanner(line);
+
+            Code code = new Code();
+
+            code.opCode = lineScanner.next();
+
+            if(lineScanner.hasNext())
+            {
+                code.val1 = lineScanner.next();
+            }
+
+            if(lineScanner.hasNext())
+            {
+                code.val2 = lineScanner.next();
+            }
+
+            if(lineScanner.hasNext())
+            {
+                code.val3 = lineScanner.next();
+            }
+
+            memory[tp] = code;
+            tp++;
+        }
     }
 
     /**
@@ -64,5 +139,13 @@ public class MipsMachine {
         //todo have the machine read from the program counter to fetch and execute the next instruction
     }
 
+
+    private static class MemorySizeException extends Exception
+    {
+        public MemorySizeException(String message)
+        {
+            super(message);
+        }
+    }
 
 }

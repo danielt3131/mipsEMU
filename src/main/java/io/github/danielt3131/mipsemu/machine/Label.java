@@ -13,12 +13,21 @@
  */
 package io.github.danielt3131.mipsemu.machine;
 
+
+/**
+ * A representation of a label in mips for jumping
+ */
 public class Label
 {
 
     protected String name;
     protected int location;
 
+    /**
+     * Creates a label
+     * @param name name of the label
+     * @param location location (index) in memory to jump to
+     */
     public Label(String name, int location)
     {
         this.name = name;

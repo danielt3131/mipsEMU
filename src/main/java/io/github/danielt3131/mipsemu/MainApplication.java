@@ -14,6 +14,7 @@
 
 package io.github.danielt3131.mipsemu;
 
+import io.github.danielt3131.mipsemu.machine.MipsMachine;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
