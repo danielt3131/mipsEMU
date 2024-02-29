@@ -20,6 +20,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class MainApplication extends Application {
@@ -33,6 +34,15 @@ public class MainApplication extends Application {
     }
 
     public static void main(String[] args) {
+        MipsMachine machine;
+        try
+        {
+            machine = new MipsMachine(4 * 200);
+            machine.readFile("mips/code.mips");
+        } catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
         launch();
     }
 }

@@ -45,62 +45,58 @@ public class MipsMachine {
 
     /**
      * Constructor for the mips emulator
+     *
      * @param memorySize the amount of memory the machine will have in bytes
      */
-    public MipsMachine(int memorySize) throws MemorySizeException
-    {
-        if(memorySize % 4 != 0)
-        {
+    public MipsMachine(int memorySize) throws MemorySizeException {
+        if (memorySize % 4 != 0) {
             throw new MemorySizeException("Memory must be multiple of 4 bytes");
         }
-        memory = new Word[memorySize/4];
+        memory = new Word[memorySize / 4];
         pc = 0;
     }
 
     /**
      * Reads in a file and puts the instructions into memory
+     *
      * @param fileDir the mips file location to read from
      */
-    public void readFile(String fileDir) throws FileNotFoundException
-    {
+    public void readFile(String fileDir) throws FileNotFoundException {
 
         int tp = 0; //tp for text pointer : where to place word in text block of memory
 
         file = new File(fileDir);
-        if(!file.exists() || !file.canRead())
-        {
+        if (!file.exists() || !file.canRead()) {
             throw new FileNotFoundException();
         }
 
         Scanner fileScanner = new Scanner(file);
         Scanner lineScanner;
 
-        while(fileScanner.hasNextLine())
-        {
+        while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
 
             //Ignore empty lines
-            if (line.isEmpty())
-            {
+            if (line.isEmpty()) {
                 continue;
             }
 
+            //Trim leading and trailing whitespace
+            line = line.trim();
+
             //Ignore comment lines
-            if (line.startsWith("#"))
-            {
+            if (line.startsWith("#")) {
                 continue;
             }
 
             //Now remove comments from end of line if it contains a comment
-            if(line.contains("#"))
-            {
-                line = line.substring(0,line.indexOf("#"));
+            if (line.contains("#")) {
+                line = line.substring(0, line.indexOf("#"));
             }
 
             //See if line is a label
-            if(line.endsWith(":"))
-            {
-                labels.add(new Label(line.substring(0,line.indexOf(":")),tp+1));
+            if (line.endsWith(":")) {
+                labels.add(new Label(line.substring(0, line.indexOf(":")), tp));
                 continue;
             }
 
@@ -111,39 +107,34 @@ public class MipsMachine {
 
             code.opCode = lineScanner.next();
 
-            if(lineScanner.hasNext())
-            {
+            if (lineScanner.hasNext()) {
                 code.val1 = lineScanner.next();
             }
 
-            if(lineScanner.hasNext())
-            {
+            if (lineScanner.hasNext()) {
                 code.val2 = lineScanner.next();
             }
 
-            if(lineScanner.hasNext())
-            {
+            if (lineScanner.hasNext()) {
                 code.val3 = lineScanner.next();
             }
 
             memory[tp] = code;
             tp++;
+            System.out.println(code);
         }
     }
 
     /**
      * has the machine read from the program counter to fetch and execute the next instruction
      */
-    public void nextStep()
-    {
+    public void nextStep() {
         //todo have the machine read from the program counter to fetch and execute the next instruction
     }
 
 
-    private static class MemorySizeException extends Exception
-    {
-        public MemorySizeException(String message)
-        {
+    public static class MemorySizeException extends Exception {
+        public MemorySizeException(String message) {
             super(message);
         }
     }

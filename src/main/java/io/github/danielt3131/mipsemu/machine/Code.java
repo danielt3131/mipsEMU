@@ -72,6 +72,25 @@ public class Code extends Word
 
     }
 
+    /**
+     * Converts a code into a string
+     * @return the string representation of a word
+     */
+    @Override
+    public String toString()
+    {
+        if (val2 == null)
+        {
+            return opCode + " " + val1;
+        }
+        if (val3 == null)
+        {
+            return opCode + " " + val1 + " " + val2;
+        }
+        return opCode + " " + val1 + " " + val2 + " " + val3;
+    }
+
+
 
 
 }
