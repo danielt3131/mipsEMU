@@ -76,52 +76,11 @@ public class MipsMachine {
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
 
-            //Ignore empty lines
-            if (line.isEmpty()) {
-                continue;
-            }
+            Word word = new Word(Integer.parseInt(line));
 
-            //Trim leading and trailing whitespace
-            line = line.trim();
-
-            //Ignore comment lines
-            if (line.startsWith("#")) {
-                continue;
-            }
-
-            //Now remove comments from end of line if it contains a comment
-            if (line.contains("#")) {
-                line = line.substring(0, line.indexOf("#"));
-            }
-
-            //See if line is a label
-            if (line.endsWith(":")) {
-                labels.add(new Label(line.substring(0, line.indexOf(":")), tp));
-                continue;
-            }
-
-            //Generate word from line
-            lineScanner = new Scanner(line);
-
-            Code code = new Code();
-
-            code.opCode = lineScanner.next();
-
-            if (lineScanner.hasNext()) {
-                code.val1 = lineScanner.next();
-            }
-
-            if (lineScanner.hasNext()) {
-                code.val2 = lineScanner.next();
-            }
-
-            if (lineScanner.hasNext()) {
-                code.val3 = lineScanner.next();
-            }
-
-            memory[tp] = code;
+            memory[tp] = word;
             tp++;
-            System.out.println(code);
+            System.out.println(word);
         }
     }
 

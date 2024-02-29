@@ -17,8 +17,7 @@ package io.github.danielt3131.mipsemu.machine;
 /**
  * A representation of a label in mips for jumping
  */
-public class Label
-{
+public class Label {
 
     protected String name;
     protected int location;

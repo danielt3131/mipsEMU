@@ -18,16 +18,14 @@ package io.github.danielt3131.mipsemu.machine;
  * Essentially an integer wrapper
  */
 
-public class Word
-{
+public class Word {
 
     int value;
 
     /**
      * Creates empty word
      */
-    protected Word()
-    {
+    protected Word() {
 
     }
 
@@ -35,9 +33,13 @@ public class Word
      * Creates word with value
      * @param value the value to make the word
      */
-    protected Word(int value)
-    {
+    protected Word(int value) {
         this.value = value;
+    }
+
+    public String toString() {
+
+        return "" + value;
     }
 
 }
