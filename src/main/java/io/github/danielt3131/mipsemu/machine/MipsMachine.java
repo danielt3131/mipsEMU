@@ -31,7 +31,7 @@ public class MipsMachine {
     private int[] register = new int[32];
 
     //Machine memory
-    private Word[] memory;
+    private Integer[] memory;
 
     //labels
     private ArrayList<Label> labels;
@@ -48,7 +48,7 @@ public class MipsMachine {
         if (memorySize % 4 != 0) {
             throw new MemorySizeException("Memory must be multiple of 4 bytes");
         }
-        memory = new Word[memorySize / 4];
+        memory = new Integer[memorySize / 4];
         pc = 0;
     }
 
@@ -72,7 +72,7 @@ public class MipsMachine {
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
 
-            Word word = new Word(Integer.parseInt(line));
+            Integer word = Integer.parseInt(line);
 
             memory[tp] = word;
             tp++;
