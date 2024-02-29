@@ -72,7 +72,7 @@ public class MipsMachine {
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
 
-            Integer word = Integer.parseInt(line);
+            Integer word = Integer.parseInt(line,2);
 
             memory[tp] = word;
             tp++;
