@@ -35,9 +35,9 @@ public class MainApplication extends Application {
 
     public static void main(String[] args) {
         MipsMachine machine;
+        machine = new MipsMachine(2000);
         try
         {
-            machine = new MipsMachine(4 * 200);
             machine.readFile("mips/code.mips");
         } catch (Exception e)
         {

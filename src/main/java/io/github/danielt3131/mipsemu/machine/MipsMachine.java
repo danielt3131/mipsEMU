@@ -31,7 +31,7 @@ public class MipsMachine {
     private int[] register = new int[32];
 
     //Machine memory
-    private Integer[] memory;
+    private byte[] memory;
 
     //labels
     private ArrayList<Label> labels;
@@ -44,12 +44,10 @@ public class MipsMachine {
      *
      * @param memorySize the amount of memory the machine will have in bytes
      */
-    public MipsMachine(int memorySize) throws MemorySizeException {
-        if (memorySize % 4 != 0) {
-            throw new MemorySizeException("Memory must be multiple of 4 bytes");
-        }
-        memory = new Integer[memorySize / 4];
-        pc = 0;
+    public MipsMachine(int memorySize){
+
+        memory = new byte[memorySize];
+
     }
 
     /**
@@ -67,16 +65,41 @@ public class MipsMachine {
         }
 
         Scanner fileScanner = new Scanner(file);
-        Scanner lineScanner;
 
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
+            Scanner lineScanner = new Scanner(line);
 
-            Integer word = Integer.parseInt(line,2);
+            //Get where to start writing code
+            lineScanner.useDelimiter(":");
+            tp = lineScanner.nextInt(2);
+            System.out.println("Starting writing at memory " + tp);
+            lineScanner.reset();
 
-            memory[tp] = word;
-            tp++;
-            System.out.println(word);
+            //Get rest of the line
+            String code = lineScanner.nextLine();
+
+            //remove ':'
+            code = code.substring(1);
+            System.out.println(code);
+            //remove spaces
+            while(code.contains(" "))
+            {
+                code = code.substring(0, code.indexOf(" ")) + code.substring(code.indexOf(" ") + 1);
+                System.out.println(code);
+            }
+            //look at next 8 characters and convert to byte and then put in memory
+            while(code.length() != 0)
+            {
+                String part = code.substring(0,8);
+                System.out.println(part);
+                byte b = (byte)Integer.parseInt(part,2);
+                memory[tp] = b;
+                code = code.substring(8);
+                tp++;
+                System.out.printf("Writing %d at %d%n", b, tp - 1);
+            }
+
         }
     }
 
@@ -87,11 +110,5 @@ public class MipsMachine {
         //todo have the machine read from the program counter to fetch and execute the next instruction
     }
 
-
-    public static class MemorySizeException extends Exception {
-        public MemorySizeException(String message) {
-            super(message);
-        }
-    }
 
 }
