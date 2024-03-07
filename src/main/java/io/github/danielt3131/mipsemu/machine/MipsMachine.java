@@ -73,7 +73,9 @@ public class MipsMachine {
             //Get where to start writing code
             lineScanner.useDelimiter(":");
             tp = lineScanner.nextInt(2);
-            System.out.println("Starting writing at memory " + tp);
+
+            //System.out.println("Starting writing at memory " + tp);
+
             lineScanner.reset();
 
             //Get rest of the line
@@ -81,23 +83,23 @@ public class MipsMachine {
 
             //remove ':'
             code = code.substring(1);
-            System.out.println(code);
+            //System.out.println(code);
             //remove spaces
             while(code.contains(" "))
             {
                 code = code.substring(0, code.indexOf(" ")) + code.substring(code.indexOf(" ") + 1);
-                System.out.println(code);
+                //System.out.println(code);
             }
             //look at next 8 characters and convert to byte and then put in memory
             while(code.length() != 0)
             {
                 String part = code.substring(0,8);
                 System.out.println(part);
-                byte b = (byte)Integer.parseInt(part,2);
+                byte b = (byte)Integer.parseInt(part,2); //Byte.parseByte crashes due to signed bit so this is a workaround
                 memory[tp] = b;
                 code = code.substring(8);
                 tp++;
-                System.out.printf("Writing %d at %d%n", b, tp - 1);
+                //System.out.printf("Writing %d at %d%n", b, tp - 1);
             }
 
         }
