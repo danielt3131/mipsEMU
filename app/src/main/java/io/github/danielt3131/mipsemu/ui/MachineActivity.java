@@ -90,9 +90,10 @@ public class MachineActivity extends AppCompatActivity {
             if (data != null) {
                 fileUri = data.getData();
                 fileInputStream = getContentResolver().openInputStream(fileUri);
-                }
             }
-        super.onActivityResult(requestCode, resultCode, data);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
 
