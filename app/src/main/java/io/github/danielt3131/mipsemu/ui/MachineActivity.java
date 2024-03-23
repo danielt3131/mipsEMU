@@ -3,10 +3,12 @@ package io.github.danielt3131.mipsemu.ui;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -89,7 +91,13 @@ public class MachineActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == FILE_OPEN_REQUEST) {
             if (data != null) {
                 fileUri = data.getData();
-                fileInputStream = getContentResolver().openInputStream(fileUri);
+                try {
+                    fileInputStream = getContentResolver().openInputStream(fileUri);
+                    Log.d("Opening file", "Opened file");
+                } catch (FileNotFoundException e) {
+                    Log.e("Opening file", e.getMessage());
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
