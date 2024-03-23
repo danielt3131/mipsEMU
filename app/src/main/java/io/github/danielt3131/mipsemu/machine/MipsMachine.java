@@ -37,9 +37,6 @@ public class MipsMachine {
     //labels
     private ArrayList<Label> labels;
 
-    //The file with mips instructions written
-    private File file;
-
     /**
      * Constructor for the mips emulator
      *
