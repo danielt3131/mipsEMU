@@ -16,6 +16,7 @@ package io.github.danielt3131.mipsemu.machine;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -53,18 +54,13 @@ public class MipsMachine {
     /**
      * Reads in a file and puts the instructions into memory
      *
-     * @param fileDir the mips file location to read from
+     * @param fileInputStream the input stream which contains the mips file
      */
-    public void readFile(String fileDir) throws FileNotFoundException {
+    public void readFile(InputStream fileInputStream) throws FileNotFoundException {
 
         int tp = 0; //tp for text pointer : where to place word in text block of memory
 
-        file = new File(fileDir);
-        if (!file.exists() || !file.canRead()) {
-            throw new FileNotFoundException();
-        }
-
-        Scanner fileScanner = new Scanner(file);
+        Scanner fileScanner = new Scanner(fileInputStream);
 
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
