@@ -104,6 +104,9 @@ public class MachineActivity extends AppCompatActivity {
                 try {
                     fileInputStream = getContentResolver().openInputStream(fileUri);
                     Log.d("Opening file", "Opened file");
+
+                    mipsMachine.readFile(fileInputStream);  // Debug to test
+
                 } catch (FileNotFoundException e) {
                     Log.e("Opening file", e.getMessage());
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
