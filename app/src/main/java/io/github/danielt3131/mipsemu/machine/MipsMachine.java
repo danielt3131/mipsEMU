@@ -14,6 +14,8 @@
 
 package io.github.danielt3131.mipsemu.machine;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -87,7 +89,7 @@ public class MipsMachine {
             while(code.length() != 0)
             {
                 String part = code.substring(0,8);
-                System.out.println(part);
+                Log.d("MipsMachine.readFile Part", part);
                 byte b = (byte)Integer.parseInt(part,2); //Byte.parseByte crashes due to signed bit so this is a workaround
                 memory[tp] = b;
                 code = code.substring(8);
