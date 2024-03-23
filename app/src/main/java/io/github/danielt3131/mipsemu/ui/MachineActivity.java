@@ -145,6 +145,11 @@ public class MachineActivity extends AppCompatActivity {
             // Set the other 2 to false
             isDecimial = false;
             isBinary = false;
+
+            // Switch the other 2 checkboxes to be off
+            decimalMode.setChecked(false);
+            binaryMode.setChecked(false);
+
             // Update the memory display
             updateMemoryDisplay();
         }
@@ -157,6 +162,11 @@ public class MachineActivity extends AppCompatActivity {
             // Set the other 2 to false
             isHex = false;
             isBinary = false;
+
+            // Switch the other 2 checkboxes to be off
+            hexMode.setChecked(false);
+            decimalMode.setChecked(false);
+
             // Update the memory display
             updateMemoryDisplay();
         }
@@ -169,6 +179,11 @@ public class MachineActivity extends AppCompatActivity {
             // Set the other 2 to false
             isDecimial = false;
             isHex = false;
+
+            // Switch the other 2 checkboxes to be off
+            decimalMode.setChecked(false);
+            hexMode.setChecked(false);
+
             // Update the memory display
             updateMemoryDisplay();
         }
