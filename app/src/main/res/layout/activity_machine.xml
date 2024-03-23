@@ -20,12 +20,12 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintVertical_bias="0.0"
         app:menu="@menu/toolbar" />
 
     <LinearLayout
-        android:layout_width="1278dp"
-        android:layout_height="734dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="1dp"
         android:layout_marginTop="1dp"
         android:layout_marginEnd="1dp"
@@ -67,34 +67,24 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <Space
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
             <CheckBox
                 android:id="@+id/decimialDisplayMode"
-                android:layout_width="200dp"
+                android:layout_width="142dp"
                 android:layout_height="wrap_content"
                 android:text="Decimial" />
 
             <CheckBox
                 android:id="@+id/hexDisplayMode"
-                android:layout_width="200dp"
+                android:layout_width="137dp"
                 android:layout_height="wrap_content"
                 android:text="Hex" />
 
             <CheckBox
                 android:id="@+id/binaryDisplayMode"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Binary" />
-
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
 
         </LinearLayout>
 
