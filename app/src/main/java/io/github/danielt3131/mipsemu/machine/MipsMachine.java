@@ -16,7 +16,6 @@ package io.github.danielt3131.mipsemu.machine;
 
 import android.util.Log;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import io.github.danielt3131.mipsemu.MachineInterface;
+import io.github.danielt3131.mipsemu.Reference;
 
 /**
  * The mips emulator that will read a file written in MIPS and then execute those commands using virtual registers
@@ -44,7 +44,7 @@ public class MipsMachine {
 
     private MachineInterface machineInterface;
     private InputStream inputFileStream;
-
+    private int memoryFormat;
 
     /**
      * Constructor for the mips emulator
@@ -60,6 +60,10 @@ public class MipsMachine {
 
     public void setInputFileStream(InputStream inputFileStream) {
         this.inputFileStream = inputFileStream;
+    }
+
+    public void setMemoryFormat(int memoryFormat) {
+        this.memoryFormat = memoryFormat;
     }
 
     /**
@@ -118,5 +122,17 @@ public class MipsMachine {
         //todo have the machine read from the program counter to fetch and execute the next instruction
     }
 
+    public void sendMemory() {
+        String memoryStr = "";
+        if (memoryFormat == Reference.HEX_MODE) {
+            // Return a string formatted in hexadecimal
+        } else if (memoryFormat == Reference.BINARY_MODE) {
+            // Return a string formatted in binary
+        } else if (memoryFormat == Reference.DECIMIAL_MODE) {
+            // Return a string formatted in decimal
+        }
+        // Pass the memoryStr to update memory
+        machineInterface.updateMemoryDisplay(memoryStr);
+    }
 
 }

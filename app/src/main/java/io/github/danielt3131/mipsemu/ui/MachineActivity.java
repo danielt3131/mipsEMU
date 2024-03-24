@@ -40,6 +40,7 @@ import java.io.InputStream;
 
 import io.github.danielt3131.mipsemu.MachineInterface;
 import io.github.danielt3131.mipsemu.R;
+import io.github.danielt3131.mipsemu.Reference;
 import io.github.danielt3131.mipsemu.machine.MipsMachine;
 
 public class MachineActivity extends AppCompatActivity {
@@ -49,9 +50,6 @@ public class MachineActivity extends AppCompatActivity {
     CheckBox decimalMode, binaryMode, hexMode;
     TextView memoryDisplay;
     private final int FILE_OPEN_REQUEST = 4;
-    final int HEX_MODE = 1;
-    final int BINARY_MODE = 0;
-    final int DECIMIAL_MODE = 2;
     Uri fileUri;
     MipsMachine mipsMachine;
     MachineInterface machineInterface;
@@ -151,74 +149,46 @@ public class MachineActivity extends AppCompatActivity {
         }
     }
 
-    // Boolean values for the 3 display modes
-    boolean isHex;
-    boolean isDecimial;
-    boolean isBinary;
-
     /**
      * Listeners for all checkboxes
      */
     View.OnClickListener hexModeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            isHex = true;
-            // Set the other 2 to false
-            isDecimial = false;
-            isBinary = false;
-
             // Switch the other 2 checkboxes to be off
             decimalMode.setChecked(false);
             binaryMode.setChecked(false);
 
-            // Update the memory display
-            updateMemoryDisplay();
+            // Tell MipsMachine the memory display option
+            mipsMachine.setMemoryFormat(Reference.HEX_MODE);
+            mipsMachine.sendMemory();
         }
     };
 
     View.OnClickListener decimalModeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            isDecimial = true;
-            // Set the other 2 to false
-            isHex = false;
-            isBinary = false;
-
             // Switch the other 2 checkboxes to be off
             hexMode.setChecked(false);
             decimalMode.setChecked(false);
 
-            // Update the memory display
-            updateMemoryDisplay();
+            // Tell MipsMachine the memory display option
+            mipsMachine.setMemoryFormat(Reference.DECIMIAL_MODE);
+            mipsMachine.sendMemory();
         }
     };
 
     View.OnClickListener binaryModeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            isBinary = true;
-            // Set the other 2 to false
-            isDecimial = false;
-            isHex = false;
-
             // Switch the other 2 checkboxes to be off
             decimalMode.setChecked(false);
             hexMode.setChecked(false);
 
-            // Update the memory display
-            updateMemoryDisplay();
+            // Tell MipsMachine the memory display option
+            mipsMachine.setMemoryFormat(Reference.BINARY_MODE);
+            mipsMachine.sendMemory();
         }
     };
 
-
-    public void updateMemoryDisplay() {
-        // TODO Get string of memory from MipsMachine with the correct display mode via a method call with 0 = binary, 1 = hex, and 2 = decimial
-        if (isHex) {
-            // Call method with HEX_MODE
-        } else if (isBinary) {
-            // Call method with BINARY_MODE
-        } else if (isDecimial) {
-            // Call method with DECIMAL_MODE
-        }
-    }
 }
