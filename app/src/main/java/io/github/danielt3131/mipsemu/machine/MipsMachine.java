@@ -20,7 +20,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
+
+import io.github.danielt3131.mipsemu.MachineInterface;
 
 /**
  * The mips emulator that will read a file written in MIPS and then execute those commands using virtual registers
@@ -39,27 +42,34 @@ public class MipsMachine {
     //labels
     private ArrayList<Label> labels;
 
+    private MachineInterface machineInterface;
+    private InputStream inputFileStream;
+
+
     /**
      * Constructor for the mips emulator
      *
      * @param memorySize the amount of memory the machine will have in bytes
      */
-    public MipsMachine(int memorySize){
+    public MipsMachine(int memorySize, MachineInterface machineInterface){
 
         memory = new byte[memorySize];
+        this.machineInterface = machineInterface;
 
+    }
+
+    public void setInputFileStream(InputStream inputFileStream) {
+        this.inputFileStream = inputFileStream;
     }
 
     /**
      * Reads in a file and puts the instructions into memory
-     *
-     * @param fileInputStream the input stream which contains the mips file
      */
-    public void readFile(InputStream fileInputStream) throws FileNotFoundException {
+    public void readFile() throws FileNotFoundException {
 
         int tp = 0; //tp for text pointer : where to place word in text block of memory
 
-        Scanner fileScanner = new Scanner(fileInputStream);
+        Scanner fileScanner = new Scanner(inputFileStream);
 
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
@@ -92,6 +102,7 @@ public class MipsMachine {
                 Log.d("MipsMachine.readFile Part", part);
                 byte b = (byte)Integer.parseInt(part,2); //Byte.parseByte crashes due to signed bit so this is a workaround
                 memory[tp] = b;
+                machineInterface.updateMemoryDisplay(Arrays.toString(memory));
                 code = code.substring(8);
                 tp++;
                 //System.out.printf("Writing %d at %d%n", b, tp - 1);

@@ -16,12 +16,14 @@ package io.github.danielt3131.mipsemu.ui;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -36,6 +38,7 @@ import androidx.core.view.WindowInsetsCompat;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import io.github.danielt3131.mipsemu.MachineInterface;
 import io.github.danielt3131.mipsemu.R;
 import io.github.danielt3131.mipsemu.machine.MipsMachine;
 
@@ -44,12 +47,14 @@ public class MachineActivity extends AppCompatActivity {
     Toolbar machineToolbar;
     Button runOneTime, runThreeTimes, runContinously;
     CheckBox decimalMode, binaryMode, hexMode;
+    TextView memoryDisplay;
     private final int FILE_OPEN_REQUEST = 4;
     final int HEX_MODE = 1;
     final int BINARY_MODE = 0;
     final int DECIMIAL_MODE = 2;
     Uri fileUri;
     MipsMachine mipsMachine;
+    MachineInterface machineInterface;
     InputStream fileInputStream;
 
     @Override
@@ -65,6 +70,9 @@ public class MachineActivity extends AppCompatActivity {
 
         machineToolbar = findViewById(R.id.materialToolbar);
 
+        // Set textViews
+        memoryDisplay = findViewById(R.id.memoryView);
+
         // Set buttons
         runOneTime = findViewById(R.id.runStepButton);
         runThreeTimes = findViewById(R.id.runStep3Button);
@@ -78,14 +86,29 @@ public class MachineActivity extends AppCompatActivity {
         // Inflate toolbar
         setSupportActionBar(machineToolbar);
 
-        // Create Mips Machine
-        mipsMachine = new MipsMachine(2000);
+        // Create Machine interface
 
+        machineInterface = new MachineInterface(this, this, memoryDisplay);
+        createMipsMachine();
         // Set buttons and checkboxes to their listeners
         decimalMode.setOnClickListener(decimalModeListener);
         hexMode.setOnClickListener(hexModeListener);
         binaryMode.setOnClickListener(binaryModeListener);
+        memoryDisplay.setMovementMethod(new ScrollingMovementMethod());
+        runContinously.setOnClickListener(v -> {
+            try {
+                mipsMachine.readFile();  // Debug to test
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
+    }
+
+    // Create Mips Machine method
+
+    private void createMipsMachine() {
+        mipsMachine = new MipsMachine(2000, machineInterface);
     }
 
     // Create the menu options in the toolbar
@@ -117,9 +140,7 @@ public class MachineActivity extends AppCompatActivity {
                 try {
                     fileInputStream = getContentResolver().openInputStream(fileUri);
                     Log.d("Opening file", "Opened file");
-
-                    mipsMachine.readFile(fileInputStream);  // Debug to test
-
+                    mipsMachine.setInputFileStream(fileInputStream);
                 } catch (FileNotFoundException e) {
                     Log.e("Opening file", e.getMessage());
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -190,7 +211,7 @@ public class MachineActivity extends AppCompatActivity {
     };
 
 
-    private void updateMemoryDisplay() {
+    public void updateMemoryDisplay() {
         // TODO Get string of memory from MipsMachine with the correct display mode via a method call with 0 = binary, 1 = hex, and 2 = decimial
         if (isHex) {
             // Call method with HEX_MODE
