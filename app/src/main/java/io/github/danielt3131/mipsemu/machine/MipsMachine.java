@@ -124,6 +124,96 @@ public class MipsMachine {
         //todo have the machine read from the program counter to fetch and execute the next instruction
     }
 
+    //HELPER METHODS
+
+    /**
+     * grabs right bits from an int
+     * @param data the integer to grab bits from
+     * @param n the amount of bits to grab
+     * @return the grabbed bits
+     */
+    public int grabRightBits(int data, int n)
+    {
+        int mask = (int)Math.pow(2,n) - 1;
+        return data & mask;
+    }
+
+    /**
+     * grabs left bits from an int
+     * @param data the integer to grab bits from
+     * @param n the amount of bits to grab
+     * @return the grabbed bits
+     */
+    public int grabLeftBits(int data, int n)
+    {
+        return data >>> 32-n;
+    }
+
+
+    /**
+     * combines the bytes into a larger format
+     * useful if bits from one byte and bits from another are used
+     * will be useful for i-type instruction
+     * @param b1 byte 1
+     * @param b2 byte 2
+     * @param b3 byte 3
+     * @param b4 byte 4
+     * @return the combination
+     */
+    private int combineBytes(byte b1, byte b2, byte b3, byte b4)
+    {
+        int result = 0;
+        result += b1;
+        result = result << 8;
+        result += b2;
+        result = result << 8;
+        result += b3;
+        result = result << 8;
+        result += b4;
+
+        return result;
+    }
+
+    /**
+     * combines the bytes into a larger format
+     * useful if bits from one byte and bits from another are used
+     * will be useful for i-type instruction
+     * @param b1 byte 1
+     * @param b2 byte 2
+     * @param b3 byte 3
+     * @return the combination
+     */
+    private int combineBytes(byte b1, byte b2, byte b3)
+    {
+        int result = 0;
+        result += b1;
+        result = result << 8;
+        result += b2;
+        result = result << 8;
+        result += b3;
+
+        return result;
+    }
+
+    /**
+     * combines the bytes into a larger format
+     * useful if bits from one byte and bits from another are used
+     * will be useful for i-type instruction
+     * @param b1 byte 1
+     * @param b2 byte 2
+     * @return the combination
+     */
+    private int combineBytes(byte b1, byte b2)
+    {
+        int result = 0;
+        result += b1;
+        result = result << 8;
+        result += b2;
+
+        return result;
+    }
+
+
     public void sendMemory() {
         String memoryStr = "";
         if (memoryFormat == Reference.HEX_MODE) {
