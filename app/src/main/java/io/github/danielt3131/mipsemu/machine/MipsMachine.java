@@ -18,8 +18,10 @@ import android.util.Log;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.Scanner;
 
 import io.github.danielt3131.mipsemu.MachineInterface;
@@ -125,11 +127,11 @@ public class MipsMachine {
     public void sendMemory() {
         String memoryStr = "";
         if (memoryFormat == Reference.HEX_MODE) {
-            // Return a string formatted in hexadecimal
+            memoryStr = HexFormat.ofDelimiter(" ").formatHex(memory);
         } else if (memoryFormat == Reference.BINARY_MODE) {
-            // Return a string formatted in binary
+            memoryStr = new BigInteger(memory).toString();
         } else if (memoryFormat == Reference.DECIMIAL_MODE) {
-            // Return a string formatted in decimal
+            memoryStr = Arrays.toString(memory);
         }
         // Pass the memoryStr to update memory
         machineInterface.updateMemoryDisplay(memoryStr);
