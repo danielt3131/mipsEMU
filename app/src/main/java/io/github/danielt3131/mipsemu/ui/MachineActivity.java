@@ -121,7 +121,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     // Menu selection
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // File selection / open option
+        // Menu options
         if (item.getItemId() == R.id.fileOpen) {
             // Summon the needed intent
             Intent openFile = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -133,8 +133,14 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             // Pull up a dialog box for the user to edit the PC (Program Counter) variable
             DialogFragment dialogFragment = new ProgramCounterDialog();
             dialogFragment.show(getSupportFragmentManager(), "pc");
-
-
+            return true;
+        }
+        if (item.getItemId() == R.id.machineReset) {
+            mipsMachine = null; // Deallocate the object
+            System.gc();    // Call the garbage collector to clean up mipsMachine
+            // Reset the machine by creating new object with the same reference name
+            createMipsMachine();
+            return true;
         }
         return false;
     }
