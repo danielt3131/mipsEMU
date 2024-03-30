@@ -5,4 +5,7 @@
     <item
         android:id="@+id/fileOpen"
         android:title="Load File" />
+    <item
+        android:id="@+id/editPC"
+        android:title="Change PC" />
 </menu>

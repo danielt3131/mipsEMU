@@ -127,6 +127,9 @@ public class MachineActivity extends AppCompatActivity {
             startActivityForResult(openFile, FILE_OPEN_REQUEST);
             return true;
         }
+        if (item.getItemId() == R.id.editPC) {
+            // Pull up a dialog box for the user to edit the PC (Program Counter) variable
+        }
         return false;
     }
 
