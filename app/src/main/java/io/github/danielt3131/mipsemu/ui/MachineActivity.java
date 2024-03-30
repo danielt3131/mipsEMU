@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.DialogFragment;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -43,7 +45,7 @@ import io.github.danielt3131.mipsemu.R;
 import io.github.danielt3131.mipsemu.Reference;
 import io.github.danielt3131.mipsemu.machine.MipsMachine;
 
-public class MachineActivity extends AppCompatActivity {
+public class MachineActivity extends AppCompatActivity implements ProgramCounterDialog.ProgramCounterDialogListener{
 
     Toolbar machineToolbar;
     Button runOneTime, runThreeTimes, runContinously;
@@ -129,6 +131,10 @@ public class MachineActivity extends AppCompatActivity {
         }
         if (item.getItemId() == R.id.editPC) {
             // Pull up a dialog box for the user to edit the PC (Program Counter) variable
+            DialogFragment dialogFragment = new ProgramCounterDialog();
+            dialogFragment.show(getSupportFragmentManager(), "pc");
+
+
         }
         return false;
     }
@@ -194,4 +200,13 @@ public class MachineActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Method interface to get the program counter value from a dialog
+     * @param dialog The dialog
+     * @param programCounterValue The program counter value as a string
+     */
+    @Override
+    public void onPositiveClick(DialogFragment dialog, String programCounterValue) {
+        // Send the programCounterValue to MipsMachine
+    }
 }
