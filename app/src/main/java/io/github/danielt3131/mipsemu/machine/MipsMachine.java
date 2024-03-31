@@ -83,15 +83,19 @@ public class MipsMachine {
             Scanner lineScanner = new Scanner(line);
 
             //Get where to start writing code
-            lineScanner.useDelimiter(":");
-            tp = lineScanner.nextInt(2);
+            lineScanner.useDelimiter(":"); // so it stops at :
+            String code = lineScanner.next();
+            //removes 0x from string
+            code = code.substring(2);
+            //now turn it into an int
+            tp = Integer.parseInt(code,16);
 
             //System.out.println("Starting writing at memory " + tp);
 
             lineScanner.reset();
 
             //Get rest of the line
-            String code = lineScanner.nextLine();
+            code = lineScanner.nextLine();
 
             //remove ':'
             code = code.substring(1);
