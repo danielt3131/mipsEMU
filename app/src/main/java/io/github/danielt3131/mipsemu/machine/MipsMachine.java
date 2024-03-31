@@ -228,6 +228,8 @@ public class MipsMachine {
      */
     public void setPc(int pc) {
         this.pc = pc;
+        machineInterface.updateProgramCounter(String.valueOf(pc));  // Update the program counter on the screen
+
     }
 
     /**
