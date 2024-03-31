@@ -12,10 +12,11 @@ public class MachineInterface {
     private Context context;
     private TextView memoryDisplay, programCounterDisplay;
 
-    public MachineInterface(Activity activity, Context context, TextView memoryDisplay) {
+    public MachineInterface(Activity activity, Context context, TextView memoryDisplay, TextView programCounterDisplay) {
         this.activity = activity;
         this.context = context;
         this.memoryDisplay = memoryDisplay;
+        this.programCounterDisplay = programCounterDisplay;
     }
 
     /**
