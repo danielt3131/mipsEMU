@@ -214,6 +214,21 @@ public class MipsMachine {
         return result;
     }
 
+    /**
+     * Getter for the program counter
+     * @return The program counter
+     */
+    public int getPc() {
+        return pc;
+    }
+
+    /**
+     * Setter for the program counter
+     * @param pc The program counter
+     */
+    public void setPc(int pc) {
+        this.pc = pc;
+    }
 
     /**
      * Method to send the memory to {@link MachineActivity} via {@link MachineInterface}
