@@ -26,6 +26,7 @@ import java.util.Scanner;
 
 import io.github.danielt3131.mipsemu.MachineInterface;
 import io.github.danielt3131.mipsemu.Reference;
+import io.github.danielt3131.mipsemu.ui.MachineActivity;
 
 /**
  * The mips emulator that will read a file written in MIPS and then execute those commands using virtual registers
@@ -217,7 +218,27 @@ public class MipsMachine {
         return result;
     }
 
+    /**
+     * Getter for the program counter
+     * @return The program counter
+     */
+    public int getPc() {
+        return pc;
+    }
 
+    /**
+     * Setter for the program counter
+     * @param pc The program counter
+     */
+    public void setPc(int pc) {
+        this.pc = pc;
+        machineInterface.updateProgramCounter(String.valueOf(pc));  // Update the program counter on the screen
+
+    }
+
+    /**
+     * Method to send the memory to {@link MachineActivity} via {@link MachineInterface}
+     */
     public void sendMemory() {
         String memoryStr = "";
         if (memoryFormat == Reference.HEX_MODE) {

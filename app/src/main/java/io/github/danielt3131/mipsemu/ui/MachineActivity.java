@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.DialogFragment;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -43,12 +45,12 @@ import io.github.danielt3131.mipsemu.R;
 import io.github.danielt3131.mipsemu.Reference;
 import io.github.danielt3131.mipsemu.machine.MipsMachine;
 
-public class MachineActivity extends AppCompatActivity {
+public class MachineActivity extends AppCompatActivity implements ProgramCounterDialog.ProgramCounterDialogListener{
 
     Toolbar machineToolbar;
     Button runOneTime, runThreeTimes, runContinously;
     CheckBox decimalMode, binaryMode, hexMode;
-    TextView memoryDisplay;
+    TextView memoryDisplay, programCounterDisplay;
     private final int FILE_OPEN_REQUEST = 4;
     Uri fileUri;
     MipsMachine mipsMachine;
@@ -70,6 +72,7 @@ public class MachineActivity extends AppCompatActivity {
 
         // Set textViews
         memoryDisplay = findViewById(R.id.memoryView);
+        programCounterDisplay = findViewById(R.id.programCounterDisplay);
 
         // Set buttons
         runOneTime = findViewById(R.id.runStepButton);
@@ -86,7 +89,7 @@ public class MachineActivity extends AppCompatActivity {
 
         // Create Machine interface
 
-        machineInterface = new MachineInterface(this, this, memoryDisplay);
+        machineInterface = new MachineInterface(this, this, memoryDisplay, programCounterDisplay);
         createMipsMachine();
         // Set buttons and checkboxes to their listeners
         decimalMode.setOnClickListener(decimalModeListener);
@@ -119,12 +122,25 @@ public class MachineActivity extends AppCompatActivity {
     // Menu selection
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // File selection / open option
+        // Menu options
         if (item.getItemId() == R.id.fileOpen) {
             // Summon the needed intent
             Intent openFile = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             openFile.setType("text/*"); // Limit the file selection to text files -> from .txt to .java
             startActivityForResult(openFile, FILE_OPEN_REQUEST);
+            return true;
+        }
+        if (item.getItemId() == R.id.editPC) {
+            // Pull up a dialog box for the user to edit the PC (Program Counter) variable
+            DialogFragment dialogFragment = new ProgramCounterDialog();
+            dialogFragment.show(getSupportFragmentManager(), "pc");
+            return true;
+        }
+        if (item.getItemId() == R.id.machineReset) {
+            mipsMachine = null; // Deallocate the object
+            System.gc();    // Call the garbage collector to clean up mipsMachine
+            // Reset the machine by creating new object with the same reference name
+            createMipsMachine();
             return true;
         }
         return false;
@@ -191,4 +207,17 @@ public class MachineActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Method interface to get the program counter value from a dialog
+     * @param dialog The dialog
+     * @param programCounterValue The program counter value as a string
+     */
+    @Override
+    public void onPositiveClick(DialogFragment dialog, String programCounterValue) {
+        try {
+            mipsMachine.setPc(Integer.parseInt(programCounterValue));
+        } catch (NumberFormatException e) {
+            Log.e("SetPC", e.getMessage());
+        }
+    }
 }

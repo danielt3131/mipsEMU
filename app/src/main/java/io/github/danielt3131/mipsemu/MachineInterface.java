@@ -10,15 +10,28 @@ import android.widget.TextView;
 public class MachineInterface {
     private Activity activity;
     private Context context;
-    private TextView memoryDisplay;
+    private TextView memoryDisplay, programCounterDisplay;
 
-    public MachineInterface(Activity activity, Context context, TextView memoryDisplay) {
+    public MachineInterface(Activity activity, Context context, TextView memoryDisplay, TextView programCounterDisplay) {
         this.activity = activity;
         this.context = context;
         this.memoryDisplay = memoryDisplay;
+        this.programCounterDisplay = programCounterDisplay;
     }
 
+    /**
+     * Method to update the memory display on the screen
+     * @param memory The memory formatted
+     */
     public void updateMemoryDisplay(String memory) {
-        memoryDisplay.setText(memory);
+        memoryDisplay.setText("Memory\n" + memory);
+    }
+
+    /**
+     * Method to update the program counter on the screen
+     * @param programCounter The program counter as a string
+     */
+    public void updateProgramCounter(String programCounter) {
+        programCounterDisplay.setText("Program Counter: " + programCounter);
     }
 }

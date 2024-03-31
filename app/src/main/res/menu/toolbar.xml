@@ -5,4 +5,10 @@
     <item
         android:id="@+id/fileOpen"
         android:title="Load File" />
+    <item
+        android:id="@+id/editPC"
+        android:title="Change PC" />
+    <item
+        android:id="@+id/machineReset"
+        android:title="Reset machine" />
 </menu>
