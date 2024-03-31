@@ -213,6 +213,10 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
      */
     @Override
     public void onPositiveClick(DialogFragment dialog, String programCounterValue) {
-        // Send the programCounterValue to MipsMachine
+        try {
+            mipsMachine.setPc(Integer.parseInt(programCounterValue));
+        } catch (NumberFormatException e) {
+            Log.e("SetPC", e.getMessage());
+        }
     }
 }
