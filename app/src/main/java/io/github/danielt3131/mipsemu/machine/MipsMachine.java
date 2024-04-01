@@ -14,6 +14,7 @@
 
 package io.github.danielt3131.mipsemu.machine;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
@@ -22,6 +23,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HexFormat;
+import java.util.Locale;
 import java.util.Scanner;
 
 import io.github.danielt3131.mipsemu.MachineInterface;
@@ -33,6 +35,7 @@ import io.github.danielt3131.mipsemu.ui.MachineActivity;
  */
 public class MipsMachine {
 
+    private final int EOS = -1; //end of step code
     //Register Variables
     private int hi, lo; //high and low of multiplication and division
     private int pc; //program counter
@@ -58,6 +61,7 @@ public class MipsMachine {
 
         memory = new byte[memorySize];
         this.machineInterface = machineInterface;
+        mstep = 0;
 
     }
 
@@ -122,12 +126,76 @@ public class MipsMachine {
         }
     }
 
+
+    private int mstep; //the micro step to run
+
     /**
      * has the machine read from the program counter to fetch and execute the next instruction
      */
     public void nextStep() {
-        //todo have the machine read from the program counter to fetch and execute the next instruction
+        //combines the 4 bytes into the full word
+        int code = combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
+        while(nextMicroStep(code) != EOS) //keeps executing until it returns EOS when step is done
+        {}
     }
+
+    public int nextMicroStep(int code)
+    {
+
+        //R-type instruction
+        if(grabLeftBits(code,6) == 0)
+        {
+
+            //Add
+            if(grabRightBits(code,6) == 0b100000)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"add\" to ALU");
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] + register[s]));
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", register[t] + register[s], d));
+                    register[d] = register[s] + register[t];
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    return EOS;
+                }
+
+
+            }
+
+
+
+        }
+        return 0;
+    }
+
 
     //HELPER METHODS
 
@@ -251,5 +319,12 @@ public class MipsMachine {
         // Pass the memoryStr to update memory
         machineInterface.updateMemoryDisplay(memoryStr);
     }
+
+    public void sendToDisplay(String message)
+    {
+        //todo add message to text area of app
+        Log.d("Step", message);
+    }
+
 
 }
