@@ -227,6 +227,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         public void onClick(View v) {
             if (gotInputStream) {
                 // Run microstep
+                mipsMachine.runNextMicroStep();
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }
@@ -238,6 +239,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         public void onClick(View v) {
             if (gotInputStream) {
                 // Run one step
+                mipsMachine.runNextStep();
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }
@@ -248,7 +250,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         @Override
         public void onClick(View v) {
             if (gotInputStream) {
-                // Run continuously
+
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }
