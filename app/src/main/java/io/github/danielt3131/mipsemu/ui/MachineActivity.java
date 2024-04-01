@@ -250,7 +250,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         @Override
         public void onClick(View v) {
             if (gotInputStream) {
-
+                mipsMachine.runContinuously();
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }
