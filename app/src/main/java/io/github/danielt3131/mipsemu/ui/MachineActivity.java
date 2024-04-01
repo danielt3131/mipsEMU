@@ -183,7 +183,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         public void onClick(View v) {
             // Switch the other 2 checkboxes to be off
             hexMode.setChecked(false);
-            decimalMode.setChecked(false);
+            binaryMode.setChecked(false);
 
             // Tell MipsMachine the memory display option
             mipsMachine.setMemoryFormat(Reference.DECIMIAL_MODE);
