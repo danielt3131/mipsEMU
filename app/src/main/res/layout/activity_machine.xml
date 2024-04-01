@@ -136,6 +136,16 @@
             android:layout_width="match_parent"
             android:layout_height="25dp" />
 
+        <TextView
+            android:id="@+id/instructionDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="25dp" />
+
         <LinearLayout
             android:id="@+id/Registers1_5"
             android:layout_width="match_parent"

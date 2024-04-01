@@ -10,13 +10,14 @@ import android.widget.TextView;
 public class MachineInterface {
     private Activity activity;
     private Context context;
-    private TextView memoryDisplay, programCounterDisplay;
+    private TextView memoryDisplay, programCounterDisplay, instructionDisplay;
 
-    public MachineInterface(Activity activity, Context context, TextView memoryDisplay, TextView programCounterDisplay) {
+    public MachineInterface(Activity activity, Context context, TextView memoryDisplay, TextView programCounterDisplay, TextView instructionDisplay) {
         this.activity = activity;
         this.context = context;
         this.memoryDisplay = memoryDisplay;
         this.programCounterDisplay = programCounterDisplay;
+        this.instructionDisplay = instructionDisplay;
     }
 
     /**
@@ -33,5 +34,13 @@ public class MachineInterface {
      */
     public void updateProgramCounter(String programCounter) {
         programCounterDisplay.setText("Program Counter: " + programCounter);
+    }
+
+    /**
+     * Method to update the instructionDisplay TextView
+     * @param instructions The instructions to display
+     */
+    public void updateInstructionDisplay(String instructions) {
+        instructionDisplay.setText("Instructions: " + instructions);
     }
 }

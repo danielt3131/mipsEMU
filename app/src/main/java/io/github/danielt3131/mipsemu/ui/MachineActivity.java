@@ -50,7 +50,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     Toolbar machineToolbar;
     Button runOneTime, runThreeTimes, runContinously;
     CheckBox decimalMode, binaryMode, hexMode;
-    TextView memoryDisplay, programCounterDisplay;
+    TextView memoryDisplay, programCounterDisplay, instructionDisplay;
     private final int FILE_OPEN_REQUEST = 4;
     Uri fileUri;
     MipsMachine mipsMachine;
@@ -73,6 +73,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         // Set textViews
         memoryDisplay = findViewById(R.id.memoryView);
         programCounterDisplay = findViewById(R.id.programCounterDisplay);
+        instructionDisplay = findViewById(R.id.instructionDisplay);
 
         // Set buttons
         runOneTime = findViewById(R.id.runStepButton);
@@ -89,7 +90,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Create Machine interface
 
-        machineInterface = new MachineInterface(this, this, memoryDisplay, programCounterDisplay);
+        machineInterface = new MachineInterface(this, this, memoryDisplay, programCounterDisplay, instructionDisplay);
         createMipsMachine();
         // Set buttons and checkboxes to their listeners
         decimalMode.setOnClickListener(decimalModeListener);
