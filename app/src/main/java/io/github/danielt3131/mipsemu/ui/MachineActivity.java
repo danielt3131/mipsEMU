@@ -23,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +47,7 @@ import io.github.danielt3131.mipsemu.machine.MipsMachine;
 public class MachineActivity extends AppCompatActivity implements ProgramCounterDialog.ProgramCounterDialogListener{
 
     Toolbar machineToolbar;
-    Button runOneTime, runThreeTimes, runContinously;
+    Button runOneTime, runMicroStep, runContinously;
     CheckBox decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay;
     private final int FILE_OPEN_REQUEST = 4;
@@ -78,7 +77,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Set buttons
         runOneTime = findViewById(R.id.runStepButton);
-        runThreeTimes = findViewById(R.id.runStep3Button);
+        runMicroStep = findViewById(R.id.runMicroStepButton);
         runContinously = findViewById(R.id.runContinouslyButton);
 
         // Set Checkboxes
@@ -98,14 +97,9 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         hexMode.setOnClickListener(hexModeListener);
         binaryMode.setOnClickListener(binaryModeListener);
         memoryDisplay.setMovementMethod(new ScrollingMovementMethod());
-        runContinously.setOnClickListener(v -> {
-            try {
-                mipsMachine.readFile();  // Debug to test
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
+        runMicroStep.setOnClickListener(runMicroStepListener);
+        runOneTime.setOnClickListener(runOneStepListener);
+        runContinously.setOnClickListener(runContinuouslyListener);
     }
 
     // Create Mips Machine method
@@ -223,4 +217,41 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             Log.e("SetPC", e.getMessage());
         }
     }
+
+    /**
+     * Methods for the clicking buttons
+     */
+
+    View.OnClickListener runMicroStepListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (gotInputStream) {
+                // Run microstep
+            } else {
+                Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    View.OnClickListener runOneStepListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (gotInputStream) {
+                // Run one step
+            } else {
+                Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    View.OnClickListener runContinuouslyListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (gotInputStream) {
+                // Run continuously
+            } else {
+                Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 }

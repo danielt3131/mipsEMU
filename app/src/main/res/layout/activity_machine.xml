@@ -107,11 +107,11 @@
                 android:layout_weight="1" />
 
             <Button
-                android:id="@+id/runStep3Button"
+                android:id="@+id/runMicroStepButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Step 3 times" />
+                android:text="Step One Microstep" />
 
             <Space
                 android:layout_width="20dp"
