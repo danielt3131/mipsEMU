@@ -56,6 +56,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     MipsMachine mipsMachine;
     MachineInterface machineInterface;
     InputStream fileInputStream;
+    private boolean gotInputStream = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +157,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
                     fileInputStream = getContentResolver().openInputStream(fileUri);
                     Log.d("Opening file", "Opened file");
                     mipsMachine.setInputFileStream(fileInputStream);
+                    gotInputStream = true;
                 } catch (FileNotFoundException e) {
                     Log.e("Opening file", e.getMessage());
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
