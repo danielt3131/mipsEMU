@@ -284,7 +284,7 @@ public class MipsMachine {
      * @param n the amount of bits to grab
      * @return the grabbed bits
      */
-    public int grabRightBits(int data, int n)
+    private int grabRightBits(int data, int n)
     {
         int mask = (int)Math.pow(2,n) - 1;
         return data & mask;
@@ -296,7 +296,7 @@ public class MipsMachine {
      * @param n the amount of bits to grab
      * @return the grabbed bits
      */
-    public int grabLeftBits(int data, int n)
+    private int grabLeftBits(int data, int n)
     {
         return data >>> 32-n;
     }
