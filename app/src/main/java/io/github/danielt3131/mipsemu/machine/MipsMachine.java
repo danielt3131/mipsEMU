@@ -135,12 +135,19 @@ public class MipsMachine {
     public void nextStep() {
         //combines the 4 bytes into the full word
         int code = combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
-        while(nextMicroStep(code) != EOS) //keeps executing until it returns EOS when step is done
-        {}
+        Log.d("Code", Integer.toBinaryString(code));
+        boolean running = true;
+        while(running) //keeps executing until it returns EOS when step is done
+        {
+            running = nextMicroStep(code) != EOS;
+        }
     }
 
     public int nextMicroStep(int code)
     {
+        Log.d("mstep", "MSTEP: " + mstep);
+
+        if(code == 0) return EOS;
 
         //R-type instruction
         if(grabLeftBits(code,6) == 0)
@@ -156,27 +163,32 @@ public class MipsMachine {
                 if(mstep == 0)
                 {
                     sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
                     return 0;
                 }
                 else if(mstep == 1)
                 {
                     sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
                     return 0;
                 }
                 else if(mstep == 2)
                 {
                     sendToDisplay("Sending \"add\" to ALU");
+                    mstep++;
                     return 0;
                 }
                 else if(mstep == 3)
                 {
                     sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] + register[s]));
+                    mstep++;
                     return 0;
                 }
                 else if(mstep == 4)
                 {
                     sendToDisplay(String.format(Locale.US,"Placing %d in register %d", register[t] + register[s], d));
                     register[d] = register[s] + register[t];
+                    mstep++;
                     return 0;
                 }
                 else if(mstep == 5)
@@ -193,7 +205,60 @@ public class MipsMachine {
 
 
         }
+
+        //I-type instruction
+        else
+        {
+            //Addi
+            if(grabLeftBits(code, 6) == 0b001000)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source
+                int t = grabRightBits(grabLeftBits(code,16),5); //destination
+                int i = grabRightBits(code,16); //immediate
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", i));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"add\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", i + register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", i + register[s], t));
+                    register[t] = register[s] + i;
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    return EOS;
+                }
+            }
+        }
         return 0;
+
+
     }
 
 
