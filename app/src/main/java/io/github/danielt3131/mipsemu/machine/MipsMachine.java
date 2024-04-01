@@ -157,7 +157,7 @@ public class MipsMachine {
 
     }
 
-    public int nextMicroStep(int code)
+    private int nextMicroStep(int code)
     {
         Log.d("mstep", "MSTEP: " + mstep);
 
