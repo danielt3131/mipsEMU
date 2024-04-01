@@ -154,7 +154,11 @@ public class MipsMachine {
      * Method to run next micro step as requested from the user or MipsMachine
      */
     public void runNextMicroStep() {
+        // Run the next microstep
+    }
 
+    public void runContinuously() {
+        // Run continuously
     }
 
     private int nextMicroStep(int code)
