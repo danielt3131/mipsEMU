@@ -132,7 +132,7 @@ public class MipsMachine {
     /**
      * has the machine read from the program counter to fetch and execute the next instruction
      */
-    public void nextStep() {
+    private void nextStep() {
         //combines the 4 bytes into the full word
         int code = combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
         Log.d("Code", Integer.toBinaryString(code));
@@ -141,6 +141,20 @@ public class MipsMachine {
         {
             running = nextMicroStep(code) != EOS;
         }
+    }
+
+    /**
+     * Method to run the next step as requested from the user or MipsMachine
+     */
+    public void runNextStep() {
+        nextStep();
+    }
+
+    /**
+     * Method to run next micro step as requested from the user or MipsMachine
+     */
+    public void runNextMicroStep() {
+
     }
 
     public int nextMicroStep(int code)
@@ -389,6 +403,7 @@ public class MipsMachine {
     {
         //todo add message to text area of app
         Log.d("Step", message);
+        machineInterface.updateInstructionDisplay(message);
     }
 
 
