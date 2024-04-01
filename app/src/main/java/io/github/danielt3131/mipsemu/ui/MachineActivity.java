@@ -90,7 +90,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Create Machine interface
 
-        machineInterface = new MachineInterface(this, this, memoryDisplay, programCounterDisplay, instructionDisplay);
+        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay);
         createMipsMachine();
         // Set buttons and checkboxes to their listeners
         decimalMode.setOnClickListener(decimalModeListener);

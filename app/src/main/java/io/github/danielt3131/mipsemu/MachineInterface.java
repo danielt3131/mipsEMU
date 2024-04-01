@@ -8,13 +8,10 @@ import android.widget.TextView;
  * Class used for communication from {@link io.github.danielt3131.mipsemu.machine.MipsMachine} to {@link io.github.danielt3131.mipsemu.ui.MachineActivity}
  */
 public class MachineInterface {
-    private Activity activity;
-    private Context context;
     private TextView memoryDisplay, programCounterDisplay, instructionDisplay;
 
-    public MachineInterface(Activity activity, Context context, TextView memoryDisplay, TextView programCounterDisplay, TextView instructionDisplay) {
-        this.activity = activity;
-        this.context = context;
+
+    public MachineInterface(TextView memoryDisplay, TextView programCounterDisplay, TextView instructionDisplay) {
         this.memoryDisplay = memoryDisplay;
         this.programCounterDisplay = programCounterDisplay;
         this.instructionDisplay = instructionDisplay;
