@@ -41,6 +41,7 @@ import androidx.fragment.app.DialogFragment;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import io.github.danielt3131.mipsemu.FileUtils;
 import io.github.danielt3131.mipsemu.MachineInterface;
 import io.github.danielt3131.mipsemu.R;
 import io.github.danielt3131.mipsemu.Reference;
@@ -269,7 +270,12 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     View.OnClickListener runFromStateListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
+            if (FileUtils.getFileName(MachineActivity.this, fileUri).contains(".mst")) {
+                mipsMachine.readState();
+                Log.d("State", "Reading in the state");
+            } else {
+                Toast.makeText(MachineActivity.this, "Wrong file", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 }
