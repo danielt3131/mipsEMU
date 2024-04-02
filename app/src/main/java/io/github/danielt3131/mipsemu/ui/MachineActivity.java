@@ -49,7 +49,7 @@ import io.github.danielt3131.mipsemu.machine.MipsMachine;
 public class MachineActivity extends AppCompatActivity implements ProgramCounterDialog.ProgramCounterDialogListener{
 
     Toolbar machineToolbar;
-    Button runOneTime, runMicroStep, runContinously;
+    Button runOneTime, runMicroStep, runContinously, runFromState;
     CheckBox decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay;
     private final int FILE_OPEN_REQUEST = 4;
@@ -84,6 +84,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         runOneTime = findViewById(R.id.runStepButton);
         runMicroStep = findViewById(R.id.runMicroStepButton);
         runContinously = findViewById(R.id.runContinouslyButton);
+        runFromState = findViewById(R.id.runStateButton);
 
         // Set Checkboxes
         decimalMode = findViewById(R.id.decimialDisplayMode);
@@ -107,6 +108,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         runMicroStep.setOnClickListener(runMicroStepListener);
         runOneTime.setOnClickListener(runOneStepListener);
         runContinously.setOnClickListener(runContinuouslyListener);
+        runFromState.setOnClickListener(runFromStateListener);
     }
 
     // Create Mips Machine method
@@ -261,6 +263,13 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }
+        }
+    };
+
+    View.OnClickListener runFromStateListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
         }
     };
 }
