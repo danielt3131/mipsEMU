@@ -69,6 +69,9 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        // Force portrait mode
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         // Set toolbar
         machineToolbar = findViewById(R.id.materialToolbar);
 
