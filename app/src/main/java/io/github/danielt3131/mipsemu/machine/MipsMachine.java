@@ -128,18 +128,19 @@ public class MipsMachine {
 
 
     private int mstep; //the micro step to run
+    private int code; //the instruction word to run
 
     /**
      * has the machine read from the program counter to fetch and execute the next instruction
      */
     private void nextStep() {
         //combines the 4 bytes into the full word
-        int code = combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
+        code = combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
         Log.d("Code", Integer.toBinaryString(code));
         boolean running = true;
         while(running) //keeps executing until it returns EOS when step is done
         {
-            running = nextMicroStep(code) != EOS;
+            running = nextMicroStep() != EOS;
         }
     }
 
@@ -154,14 +155,14 @@ public class MipsMachine {
      * Method to run next micro step as requested from the user or MipsMachine
      */
     public void runNextMicroStep() {
-        // Run the next microstep
+        nextMicroStep();
     }
 
     public void runContinuously() {
         // Run continuously
     }
 
-    private int nextMicroStep(int code)
+    private int nextMicroStep()
     {
         Log.d("mstep", "MSTEP: " + mstep);
 
