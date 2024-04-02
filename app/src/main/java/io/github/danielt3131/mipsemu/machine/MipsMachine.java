@@ -126,6 +126,49 @@ public class MipsMachine {
         }
     }
 
+    /**
+     * reads from file a state and loads it into machine
+     */
+    public void readState()
+    {
+        Scanner fileScanner = new Scanner(inputFileStream);
+
+        //reads register
+        for(int i = 0; i < 32; i++)
+        {
+            register[i] = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        }
+        //reads pc, hi, lo
+
+        pc = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        hi = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        lo = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+
+        //reads amount of memory
+        int memSize = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        memory = new byte[memSize];
+
+        //sets the stack
+        int stackSize = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        for(int i = memSize; i > memSize - stackSize; i--)
+        {
+            memory[i] = fileScanner.nextByte();
+        }
+
+        //sets the text
+        int textSize = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        for(int i = 0; i < textSize; i++)
+        {
+            memory[i] = fileScanner.nextByte();
+        }
+
+    }
+
+    public void readState(State state) throws FileNotFoundException
+    {
+        //todo read from state file and update machine
+    }
+
 
     private int mstep; //the micro step to run
 
