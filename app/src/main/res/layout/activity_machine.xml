@@ -107,11 +107,11 @@
                 android:layout_weight="1" />
 
             <Button
-                android:id="@+id/runStep3Button"
+                android:id="@+id/runMicroStepButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Step 3 times" />
+                android:text="Step One Microstep" />
 
             <Space
                 android:layout_width="20dp"
@@ -136,6 +136,16 @@
             android:layout_width="match_parent"
             android:layout_height="25dp" />
 
+        <TextView
+            android:id="@+id/instructionDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Instructions" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="25dp" />
+
         <LinearLayout
             android:id="@+id/Registers1_5"
             android:layout_width="match_parent"
@@ -154,21 +164,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="T0" />
 
             <TextView
                 android:id="@+id/registerT1_Display"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="T1" />
 
             <TextView
                 android:id="@+id/registerT2_Display"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="T2" />
         </LinearLayout>
 
     </LinearLayout>

@@ -8,15 +8,13 @@ import android.widget.TextView;
  * Class used for communication from {@link io.github.danielt3131.mipsemu.machine.MipsMachine} to {@link io.github.danielt3131.mipsemu.ui.MachineActivity}
  */
 public class MachineInterface {
-    private Activity activity;
-    private Context context;
-    private TextView memoryDisplay, programCounterDisplay;
+    private TextView memoryDisplay, programCounterDisplay, instructionDisplay;
 
-    public MachineInterface(Activity activity, Context context, TextView memoryDisplay, TextView programCounterDisplay) {
-        this.activity = activity;
-        this.context = context;
+
+    public MachineInterface(TextView memoryDisplay, TextView programCounterDisplay, TextView instructionDisplay) {
         this.memoryDisplay = memoryDisplay;
         this.programCounterDisplay = programCounterDisplay;
+        this.instructionDisplay = instructionDisplay;
     }
 
     /**
@@ -33,5 +31,13 @@ public class MachineInterface {
      */
     public void updateProgramCounter(String programCounter) {
         programCounterDisplay.setText("Program Counter: " + programCounter);
+    }
+
+    /**
+     * Method to update the instructionDisplay TextView
+     * @param instructions The instructions to display
+     */
+    public void updateInstructionDisplay(String instructions) {
+        instructionDisplay.setText("Instructions: " + instructions);
     }
 }
