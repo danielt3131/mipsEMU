@@ -126,6 +126,11 @@ public class MipsMachine {
         }
     }
 
+    public void readState(State state) throws FileNotFoundException
+    {
+        //todo read from state file and update machine
+    }
+
 
     private int mstep; //the micro step to run
 
