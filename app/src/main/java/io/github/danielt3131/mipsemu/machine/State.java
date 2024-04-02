@@ -52,7 +52,7 @@ public class State
 
      */
     public File toFile(String fileName) throws IOException {
-        File out = new File(fileName);
+        File out = new File("/storage/emulated/0/Documents" + fileName);
         FileOutputStream outputStream = null;
         try
         {
