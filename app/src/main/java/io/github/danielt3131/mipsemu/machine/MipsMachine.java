@@ -508,5 +508,9 @@ public class MipsMachine {
         machineInterface.updateInstructionDisplay(message);
     }
 
+    public void saveState() {
+        // Save the state.
+    }
+
 
 }
