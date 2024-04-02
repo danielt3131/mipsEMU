@@ -13,11 +13,14 @@
  */
 package io.github.danielt3131.mipsemu.ui;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -75,6 +78,11 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Set toolbar
         machineToolbar = findViewById(R.id.materialToolbar);
+        if (!Environment.isExternalStorageManager()) {
+            Toast.makeText(this, "Need all file access", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            startActivity(intent);
+        }
 
         // Set textViews
         memoryDisplay = findViewById(R.id.memoryView);
@@ -266,6 +274,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             }
         }
     };
+
 
     View.OnClickListener runFromStateListener = new View.OnClickListener() {
         @Override
