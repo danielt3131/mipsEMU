@@ -164,25 +164,30 @@ public class MipsMachine {
 
     }
 
-    public void readState(State state) throws FileNotFoundException
-    {
+    public void readState(State state) throws FileNotFoundException {
         //todo read from state file and update machine
+    }
+    private int getCode()
+    {
+        return combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
     }
 
 
     private int mstep; //the micro step to run
+    private int code; //the instruction word to run
+    private boolean needNext; //determines if nextMicroStep needs to update code
 
     /**
      * has the machine read from the program counter to fetch and execute the next instruction
      */
     private void nextStep() {
         //combines the 4 bytes into the full word
-        int code = combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
+        code = getCode();
         Log.d("Code", Integer.toBinaryString(code));
         boolean running = true;
         while(running) //keeps executing until it returns EOS when step is done
         {
-            running = nextMicroStep(code) != EOS;
+            running = nextMicroStep() != EOS;
         }
     }
 
@@ -197,14 +202,14 @@ public class MipsMachine {
      * Method to run next micro step as requested from the user or MipsMachine
      */
     public void runNextMicroStep() {
-        // Run the next microstep
+        nextMicroStep();
     }
 
     public void runContinuously() {
         // Run continuously
     }
 
-    private int nextMicroStep(int code)
+    private int nextMicroStep()
     {
         Log.d("mstep", "MSTEP: " + mstep);
 
@@ -257,6 +262,56 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
+                    return EOS;
+                }
+
+
+            }
+
+            //Subtract
+            else if(grabRightBits(code,6) == 0b1000010)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"sub\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] - register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", register[t] - register[s], d));
+                    register[d] = register[s] - register[t];
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    needNext = true;
                     return EOS;
                 }
 
