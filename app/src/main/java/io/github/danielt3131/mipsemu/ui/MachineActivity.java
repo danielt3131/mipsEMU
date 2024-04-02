@@ -157,6 +157,9 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             createMipsMachine();
             return true;
         }
+        if (item.getItemId() == R.id.saveState) {
+            mipsMachine.saveState();
+        }
         return false;
     }
 
