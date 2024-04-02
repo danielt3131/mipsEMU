@@ -14,6 +14,8 @@
 package io.github.danielt3131.mipsemu.ui;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -67,7 +69,10 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        // Force portrait mode
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        // Set toolbar
         machineToolbar = findViewById(R.id.materialToolbar);
 
         // Set textViews
@@ -89,9 +94,11 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         setSupportActionBar(machineToolbar);
 
         // Create Machine interface
-
         machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay);
+
+        // Create the machine
         createMipsMachine();
+
         // Set buttons and checkboxes to their listeners
         decimalMode.setOnClickListener(decimalModeListener);
         hexMode.setOnClickListener(hexModeListener);
