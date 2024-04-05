@@ -212,6 +212,9 @@ public class MipsMachine {
 
     public void runContinuously() {
         // Run continuously
+        while (code != 0) {
+            nextStep();
+        }
     }
 
     private int nextMicroStep()
