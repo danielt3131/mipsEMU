@@ -165,14 +165,10 @@ public class MipsMachine {
 
     }
 
-    public void readState(State state) throws FileNotFoundException {
-        //todo read from state file and update machine
-    }
     private int getCode()
     {
         return combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
     }
-
 
     private int mstep; //the micro step to run
     private int code; //the instruction word to run

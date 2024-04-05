@@ -9,29 +9,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class State
+public class StateManager
 {
 
-    int[] register;
-    int pc, hi, lo;
-    byte[] memory;
-
-    ArrayList<Byte> byteArrayList = new ArrayList<>();
-
-    public State(int[] register, int pc, int hi, int lo, byte[] memory)
-    {
-        super();
-        this.register = register;
-        this.pc = pc;
-        this.hi = hi;
-        this.lo = lo;
-        this.memory = memory;
-    }
-
-    public State()
-    {
-        super();
-    }
+    private static ArrayList<Byte> byteArrayList = new ArrayList<>();
 
     /*
     .mst file breakdown
@@ -48,16 +29,15 @@ public class State
     ...
     the text
     ...
-
-
      */
-    public File toFile(String fileName) throws IOException {
-        File out = new File("/storage/emulated/0/Documents" + fileName);
+    public static File toFile(String fileName,int[] register, int pc, int hi, int lo, byte[] memory) throws IOException {
+        File out = new File(fileName);
+
         FileOutputStream outputStream = null;
         try
         {
             outputStream = new FileOutputStream(out);
-            createByteArray();
+            createByteArray(register, pc, hi, lo,memory);
             byte[] b = new byte[byteArrayList.size()];
             for(int i = 0; i < b.length; i++)
             {
@@ -74,7 +54,7 @@ public class State
         return out;
     }
 
-    private byte[] intToBytes(int i)
+    private static byte[] intToBytes(int i)
     {
         byte b1 = (byte)grabLeftBits(i , 8);
         byte b2 = (byte)grabRightBits(grabLeftBits(i, 16),8);
@@ -90,7 +70,7 @@ public class State
      * @param n the amount of bits to grab
      * @return the grabbed bits
      */
-    private int grabRightBits(int data, int n)
+    private static int grabRightBits(int data, int n)
     {
         int mask = (int)Math.pow(2,n) - 1;
         return data & mask;
@@ -102,18 +82,18 @@ public class State
      * @param n the amount of bits to grab
      * @return the grabbed bits
      */
-    private int grabLeftBits(int data, int n)
+    private static int grabLeftBits(int data, int n)
     {
         return data >>> 32-n;
     }
 
-    private void addToByteArray(byte b)
+    private static void addToByteArray(byte b)
     {
         byteArrayList.add(b);
         Log.d("Writing File", String.format("added %d to file", b));
     }
 
-    private void addToByteArray(byte[] b)
+    private static void addToByteArray(byte[] b)
     {
         for(byte c : b)
         {
@@ -121,7 +101,7 @@ public class State
         }
     }
 
-    private void createByteArray()
+    private static void createByteArray(int[] register, int pc, int hi, int lo, byte[] memory)
     {
         //Creating file
 
