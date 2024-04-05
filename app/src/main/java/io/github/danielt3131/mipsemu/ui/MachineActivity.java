@@ -54,6 +54,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     Button runOneTime, runMicroStep, runContinously;
     CheckBox decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay;
+    TextView[] registerDispalys;
     private final int FILE_OPEN_REQUEST = 4;
     Uri inputFileUri, outputFileUri;
     MipsMachine mipsMachine;
@@ -82,6 +83,9 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         programCounterDisplay = findViewById(R.id.programCounterDisplay);
         instructionDisplay = findViewById(R.id.instructionDisplay);
 
+        // Inflate the registers
+        inflateRegisters();
+
         // Set buttons
         runOneTime = findViewById(R.id.runStepButton);
         runMicroStep = findViewById(R.id.runMicroStepButton);
@@ -96,7 +100,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         setSupportActionBar(machineToolbar);
 
         // Create Machine interface
-        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay);
+        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDispalys);
 
         // Create the machine
         createMipsMachine();
@@ -115,6 +119,53 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
     private void createMipsMachine() {
         mipsMachine = new MipsMachine(2000, machineInterface);
+    }
+
+    /**
+     * Creates register text view array and set each element to its text view
+     */
+    private void inflateRegisters() {
+        registerDispalys = new TextView[32];    // The number of registers
+        registerDispalys[Reference.REGISTER_ZERO] = findViewById(R.id.register_ZERO);
+
+        registerDispalys[Reference.REGISTER_V0] = findViewById(R.id.register_V0);
+        registerDispalys[Reference.REGISTER_V1] = findViewById(R.id.register_V1);
+
+        registerDispalys[Reference.REGISTER_T0] = findViewById(R.id.register_T0);
+        registerDispalys[Reference.REGISTER_T1] = findViewById(R.id.register_T1);
+        registerDispalys[Reference.REGISTER_T2] = findViewById(R.id.register_T2);
+        registerDispalys[Reference.REGISTER_T3] = findViewById(R.id.register_T3);
+        registerDispalys[Reference.REGISTER_T4] = findViewById(R.id.register_T4);
+        registerDispalys[Reference.REGISTER_T5] = findViewById(R.id.register_T5);
+        registerDispalys[Reference.REGISTER_T6] = findViewById(R.id.register_T6);
+        registerDispalys[Reference.REGISTER_T7] = findViewById(R.id.register_T7);
+        registerDispalys[Reference.REGISTER_T8] = findViewById(R.id.register_T8);
+        registerDispalys[Reference.REGISTER_T9] = findViewById(R.id.register_T9);
+
+        registerDispalys[Reference.REGISTER_A0] = findViewById(R.id.register_A0);
+        registerDispalys[Reference.REGISTER_A1] = findViewById(R.id.register_A1);
+        registerDispalys[Reference.REGISTER_A2] = findViewById(R.id.register_A2);
+        registerDispalys[Reference.REGISTER_A3] = findViewById(R.id.register_A3);
+
+        registerDispalys[Reference.REGISTER_K0] = findViewById(R.id.register_K0);
+        registerDispalys[Reference.REGISTER_K1] = findViewById(R.id.register_K1);
+
+        registerDispalys[Reference.REGISTER_S0] = findViewById(R.id.register_S0);
+        registerDispalys[Reference.REGISTER_S1] = findViewById(R.id.register_S1);
+        registerDispalys[Reference.REGISTER_S2] = findViewById(R.id.register_S2);
+        registerDispalys[Reference.REGISTER_S3] = findViewById(R.id.register_S3);
+        registerDispalys[Reference.REGISTER_S4] = findViewById(R.id.register_S4);
+        registerDispalys[Reference.REGISTER_S5] = findViewById(R.id.register_S5);
+        registerDispalys[Reference.REGISTER_S6] = findViewById(R.id.register_S6);
+        registerDispalys[Reference.REGISTER_S7] = findViewById(R.id.register_S7);
+
+        registerDispalys[Reference.REGISTER_FP] = findViewById(R.id.register_FP);
+        registerDispalys[Reference.REGISTER_SP] = findViewById(R.id.register_SP);
+        registerDispalys[Reference.REGISTER_GP] = findViewById(R.id.register_GP);
+        registerDispalys[Reference.REGISTER_RA] = findViewById(R.id.register_RA);
+        registerDispalys[Reference.REGISTER_AT] = findViewById(R.id.register_AT);
+
+
     }
 
     // Create the menu options in the toolbar

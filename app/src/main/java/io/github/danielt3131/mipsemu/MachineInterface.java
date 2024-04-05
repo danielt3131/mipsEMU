@@ -9,12 +9,20 @@ import android.widget.TextView;
  */
 public class MachineInterface {
     private TextView memoryDisplay, programCounterDisplay, instructionDisplay;
+    private TextView[] registers;
 
-
-    public MachineInterface(TextView memoryDisplay, TextView programCounterDisplay, TextView instructionDisplay) {
+    /**
+     *
+     * @param memoryDisplay The memory display
+     * @param programCounterDisplay The program counter display
+     * @param instructionDisplay The instruction display
+     * @param registers The array of registers
+     */
+    public MachineInterface(TextView memoryDisplay, TextView programCounterDisplay, TextView instructionDisplay, TextView[] registers) {
         this.memoryDisplay = memoryDisplay;
         this.programCounterDisplay = programCounterDisplay;
         this.instructionDisplay = instructionDisplay;
+        this.registers = registers;
     }
 
     /**
@@ -39,5 +47,9 @@ public class MachineInterface {
      */
     public void updateInstructionDisplay(String instructions) {
         instructionDisplay.setText("Instructions: " + instructions);
+    }
+
+    public void updateIndividualRegister(int register, String registerValue) {
+        registers[register].setText(registerValue);
     }
 }
