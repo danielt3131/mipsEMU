@@ -2,6 +2,7 @@ package io.github.danielt3131.mipsemu;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -49,7 +50,28 @@ public class MachineInterface {
         instructionDisplay.setText("Instructions: " + instructions);
     }
 
+    /**
+     * Updates an individual register display
+     * @param register The register to update
+     * @param registerValue The register value
+     */
     public void updateIndividualRegister(int register, String registerValue) {
         registers[register].setText(registerValue);
+        Log.d("Updated Register: " + register, registerValue);
+    }
+
+    /**
+     * Updates all the register displays
+     * @param registerValues The string array containing the value of every register
+     */
+    public void updateAllRegisters(String[] registerValues) {
+        for (int i = 0; i < registers.length; i++) {
+            try {
+                registers[i].setText(registerValues[i]);
+                Log.d("Updated Register: " + i, registerValues[i]);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                Log.e("Update Register", e.getMessage());
+            }
+        }
     }
 }
