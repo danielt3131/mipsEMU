@@ -4,6 +4,7 @@ public class Reference {
     public static final int HEX_MODE = 1;
     public static final int BINARY_MODE = 0;
     public static final int DECIMIAL_MODE = 2;
+    public static final int CREATE_OUTPUTSTREAM = 24;
 
     //  Registers
     public static final int REGISTER_ZERO = 0;

@@ -13,14 +13,10 @@
  */
 package io.github.danielt3131.mipsemu.ui;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -42,7 +38,9 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.DialogFragment;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import io.github.danielt3131.mipsemu.FileUtils;
 import io.github.danielt3131.mipsemu.MachineInterface;
@@ -57,7 +55,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     CheckBox decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay;
     private final int FILE_OPEN_REQUEST = 4;
-    Uri fileUri;
+    Uri inputFileUri, outputFileUri;
     MipsMachine mipsMachine;
     MachineInterface machineInterface;
     InputStream fileInputStream;
@@ -78,11 +76,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Set toolbar
         machineToolbar = findViewById(R.id.materialToolbar);
-        if (!Environment.isExternalStorageManager()) {
-            Toast.makeText(this, "Need all file access", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-            startActivity(intent);
-        }
 
         // Set textViews
         memoryDisplay = findViewById(R.id.memoryView);
@@ -158,18 +151,25 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             return true;
         }
         if (item.getItemId() == R.id.saveState) {
-            mipsMachine.saveState();
+            createOutputStream();
         }
         return false;
+    }
+
+    private void createOutputStream() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.setType("text/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(intent, Reference.CREATE_OUTPUTSTREAM);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK && requestCode == FILE_OPEN_REQUEST) {
             if (data != null) {
-                fileUri = data.getData();
+                inputFileUri = data.getData();
                 try {
-                    fileInputStream = getContentResolver().openInputStream(fileUri);
+                    fileInputStream = getContentResolver().openInputStream(inputFileUri);
                     Log.d("Opening file", "Opened file");
                     mipsMachine.setInputFileStream(fileInputStream);
                     gotInputStream = true;
@@ -178,7 +178,19 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
-        } else {
+        }
+        if (resultCode == RESULT_OK && requestCode == Reference.CREATE_OUTPUTSTREAM) {
+            if (data != null) {
+                outputFileUri = data.getData();
+                try {
+                    OutputStream outputStream = getContentResolver().openOutputStream(outputFileUri);
+                    mipsMachine.saveState(outputStream);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -282,7 +294,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     View.OnClickListener runFromStateListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (FileUtils.getFileName(MachineActivity.this, fileUri).contains(".mst")) {
+            if (FileUtils.getFileName(MachineActivity.this, inputFileUri).contains(".mst")) {
                 mipsMachine.readState();
                 Log.d("State", "Reading in the state");
             } else {

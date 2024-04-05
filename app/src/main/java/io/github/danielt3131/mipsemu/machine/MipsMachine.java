@@ -18,8 +18,11 @@ import android.annotation.SuppressLint;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -510,15 +513,14 @@ public class MipsMachine {
         machineInterface.updateInstructionDisplay(message);
     }
 
-    public void saveState() {
-        // Save the state.
-        State state = new State(register, pc, hi, lo, memory);
-        try {
-            state.toFile("state.mst");
-        } catch (IOException e) {
-            Log.e("State", e.getMessage());
-            throw new RuntimeException(e);
-        }
+    public void saveState(OutputStream outputStream) throws IOException {
+        // Write header
+//        PrintWriter printWriter = new PrintWriter(outputStream);
+//        printWriter.println("State");
+//        printWriter.close();
+        // Save the save
+        Log.d("saveState", "Starting to save the state");
+        StateManager.toFile(outputStream, register, pc, hi, lo, memory);
     }
 
 
