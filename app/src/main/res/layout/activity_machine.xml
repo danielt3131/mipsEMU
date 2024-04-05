@@ -130,13 +130,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
 
-            <Button
-                android:id="@+id/runStateButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Run from state" />
-
         </LinearLayout>
 
         <Space
@@ -146,7 +139,7 @@
         <TextView
             android:id="@+id/instructionDisplay"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="54dp"
             android:text="Instructions" />
 
         <Space

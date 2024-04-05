@@ -51,7 +51,7 @@ import io.github.danielt3131.mipsemu.machine.MipsMachine;
 public class MachineActivity extends AppCompatActivity implements ProgramCounterDialog.ProgramCounterDialogListener{
 
     Toolbar machineToolbar;
-    Button runOneTime, runMicroStep, runContinously, runFromState;
+    Button runOneTime, runMicroStep, runContinously;
     CheckBox decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay;
     private final int FILE_OPEN_REQUEST = 4;
@@ -86,7 +86,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         runOneTime = findViewById(R.id.runStepButton);
         runMicroStep = findViewById(R.id.runMicroStepButton);
         runContinously = findViewById(R.id.runContinouslyButton);
-        runFromState = findViewById(R.id.runStateButton);
 
         // Set Checkboxes
         decimalMode = findViewById(R.id.decimialDisplayMode);
@@ -110,7 +109,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         runMicroStep.setOnClickListener(runMicroStepListener);
         runOneTime.setOnClickListener(runOneStepListener);
         runContinously.setOnClickListener(runContinuouslyListener);
-        runFromState.setOnClickListener(runFromStateListener);
     }
 
     // Create Mips Machine method
@@ -145,7 +143,8 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         }
         if (item.getItemId() == R.id.machineReset) {
             mipsMachine = null; // Deallocate the object
-            System.gc();    // Call the garbage collector to clean up mipsMachine
+            System.gc();// Call the garbage collector to clean up mipsMachine
+            gotInputStream = false;
             // Reset the machine by creating new object with the same reference name
             createMipsMachine();
             return true;
@@ -194,7 +193,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
     /**
      * Listeners for all checkboxes
      */
@@ -286,19 +284,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
                 mipsMachine.runContinuously();
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
-
-
-    View.OnClickListener runFromStateListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (FileUtils.getFileName(MachineActivity.this, inputFileUri).contains(".mst")) {
-                mipsMachine.readState();
-                Log.d("State", "Reading in the state");
-            } else {
-                Toast.makeText(MachineActivity.this, "Wrong file", Toast.LENGTH_SHORT).show();
             }
         }
     };
