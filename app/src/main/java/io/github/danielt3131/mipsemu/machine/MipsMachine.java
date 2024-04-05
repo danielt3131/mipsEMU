@@ -52,6 +52,7 @@ public class MipsMachine {
     private MachineInterface machineInterface;
     private InputStream inputFileStream;
     private int memoryFormat;
+    private Scanner fileScanner;
 
     /**
      * Constructor for the mips emulator
@@ -68,6 +69,12 @@ public class MipsMachine {
 
     public void setInputFileStream(InputStream inputFileStream) {
         this.inputFileStream = inputFileStream;
+        fileScanner = new Scanner(inputFileStream);
+        if (fileScanner.hasNext("State")) {
+            readState();
+        } else {
+            readFile();
+        }
     }
 
     public void setMemoryFormat(int memoryFormat) {
@@ -77,11 +84,10 @@ public class MipsMachine {
     /**
      * Reads in a file and puts the instructions into memory
      */
-    public void readFile() throws FileNotFoundException {
+    public void readFile() {
 
         int tp = 0; //tp for text pointer : where to place word in text block of memory
 
-        Scanner fileScanner = new Scanner(inputFileStream);
 
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
@@ -132,7 +138,6 @@ public class MipsMachine {
      */
     public void readState()
     {
-        Scanner fileScanner = new Scanner(inputFileStream);
 
         //reads register
         for(int i = 0; i < 32; i++)
