@@ -56,8 +56,8 @@ public class MachineInterface {
      * @param registerValue The register value
      */
     public void updateIndividualRegister(int register, String registerValue) {
-        registers[register].setText(registerValue);
-        Log.d("Updated Register: " + register, registerValue);
+        registers[register].setText(Reference.registerNames[register] + ": " + registerValue);
+        Log.d("Updated Register: " + Reference.registerNames[register], registerValue);
     }
 
     /**
@@ -67,8 +67,8 @@ public class MachineInterface {
     public void updateAllRegisters(String[] registerValues) {
         for (int i = 0; i < registers.length; i++) {
             try {
-                registers[i].setText(registerValues[i]);
-                Log.d("Updated Register: " + i, registerValues[i]);
+                registers[i].setText(Reference.registerNames[i] + ": " + registerValues[i]);
+                Log.d("Updated Register: " + Reference.registerNames[i], registerValues[i]);
             } catch (ArrayIndexOutOfBoundsException e) {
                 Log.e("Update Register", e.getMessage());
             }
