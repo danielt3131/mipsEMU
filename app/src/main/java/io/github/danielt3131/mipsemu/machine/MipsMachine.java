@@ -18,7 +18,11 @@ import android.annotation.SuppressLint;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +55,7 @@ public class MipsMachine {
     private MachineInterface machineInterface;
     private InputStream inputFileStream;
     private int memoryFormat;
+    private Scanner fileScanner;
 
     /**
      * Constructor for the mips emulator
@@ -67,6 +72,12 @@ public class MipsMachine {
 
     public void setInputFileStream(InputStream inputFileStream) {
         this.inputFileStream = inputFileStream;
+        fileScanner = new Scanner(inputFileStream);
+        if (fileScanner.hasNext("State")) {
+            readState();
+        } else {
+            readFile();
+        }
     }
 
     public void setMemoryFormat(int memoryFormat) {
@@ -76,11 +87,10 @@ public class MipsMachine {
     /**
      * Reads in a file and puts the instructions into memory
      */
-    public void readFile() throws FileNotFoundException {
+    public void readFile() {
 
         int tp = 0; //tp for text pointer : where to place word in text block of memory
 
-        Scanner fileScanner = new Scanner(inputFileStream);
 
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
@@ -131,7 +141,6 @@ public class MipsMachine {
      */
     public void readState()
     {
-        Scanner fileScanner = new Scanner(inputFileStream);
 
         //reads register
         for(int i = 0; i < 32; i++)
@@ -164,20 +173,26 @@ public class MipsMachine {
 
     }
 
+    private int getCode()
+    {
+        return combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
+    }
 
     private int mstep; //the micro step to run
+    private int code; //the instruction word to run
+    private boolean needNext; //determines if nextMicroStep needs to update code
 
     /**
      * has the machine read from the program counter to fetch and execute the next instruction
      */
     private void nextStep() {
         //combines the 4 bytes into the full word
-        int code = combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
+        code = getCode();
         Log.d("Code", Integer.toBinaryString(code));
         boolean running = true;
         while(running) //keeps executing until it returns EOS when step is done
         {
-            running = nextMicroStep(code) != EOS;
+            running = nextMicroStep() != EOS;
         }
     }
 
@@ -192,14 +207,14 @@ public class MipsMachine {
      * Method to run next micro step as requested from the user or MipsMachine
      */
     public void runNextMicroStep() {
-        // Run the next microstep
+        nextMicroStep();
     }
 
     public void runContinuously() {
         // Run continuously
     }
 
-    private int nextMicroStep(int code)
+    private int nextMicroStep()
     {
         Log.d("mstep", "MSTEP: " + mstep);
 
@@ -252,6 +267,56 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
+                    return EOS;
+                }
+
+
+            }
+
+            //Subtract
+            else if(grabRightBits(code,6) == 0b1000010)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"sub\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] - register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", register[t] - register[s], d));
+                    register[d] = register[s] - register[t];
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    needNext = true;
                     return EOS;
                 }
 
@@ -446,6 +511,16 @@ public class MipsMachine {
         //todo add message to text area of app
         Log.d("Step", message);
         machineInterface.updateInstructionDisplay(message);
+    }
+
+    public void saveState(OutputStream outputStream) throws IOException {
+        // Write header
+//        PrintWriter printWriter = new PrintWriter(outputStream);
+//        printWriter.println("State");
+//        printWriter.close();
+        // Save the save
+        Log.d("saveState", "Starting to save the state");
+        StateManager.toFile(outputStream, register, pc, hi, lo, memory);
     }
 
 

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class StateManager
@@ -16,6 +17,7 @@ public class StateManager
 
     /*
     .mst file breakdown
+    State (Header)
     first 128 bytes determine what is in register
     pc (4 bytes)
     hi (4 bytes)
@@ -30,27 +32,20 @@ public class StateManager
     the text
     ...
      */
-    public static File toFile(String fileName,int[] register, int pc, int hi, int lo, byte[] memory) throws IOException {
-        File out = new File(fileName);
-        FileOutputStream outputStream = null;
-        try
-        {
-            outputStream = new FileOutputStream(out);
-            createByteArray(register, pc, hi, lo,memory);
+    public static void toFile(OutputStream outputStream, int[] register, int pc, int hi, int lo, byte[] memory) {
+        Log.d("StateManager", "Saving state");
+        try {
+            createByteArray(register, pc, hi, lo, memory);
             byte[] b = new byte[byteArrayList.size()];
-            for(int i = 0; i < b.length; i++)
-            {
+            for (int i = 0; i < b.length; i++) {
                 b[i] = byteArrayList.get(i);
             }
-            outputStream.write(b);
+            outputStream.write(b, 6, b.length);
             outputStream.flush();
             outputStream.close();
-        } catch (FileNotFoundException e)
-        {
-            Log.e("FileNotFound",e.getMessage(),e);
+        } catch (IOException e) {
+            Log.e("StateManager", e.getMessage());
         }
-
-        return out;
     }
 
     private static byte[] intToBytes(int i)

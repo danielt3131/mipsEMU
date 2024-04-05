@@ -11,4 +11,7 @@
     <item
         android:id="@+id/machineReset"
         android:title="Reset machine" />
+    <item
+        android:id="@+id/saveState"
+        android:title="Save state" />
 </menu>

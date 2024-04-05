@@ -15,7 +15,6 @@ package io.github.danielt3131.mipsemu.ui;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -39,8 +38,11 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.DialogFragment;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
+import io.github.danielt3131.mipsemu.FileUtils;
 import io.github.danielt3131.mipsemu.MachineInterface;
 import io.github.danielt3131.mipsemu.R;
 import io.github.danielt3131.mipsemu.Reference;
@@ -49,11 +51,11 @@ import io.github.danielt3131.mipsemu.machine.MipsMachine;
 public class MachineActivity extends AppCompatActivity implements ProgramCounterDialog.ProgramCounterDialogListener{
 
     Toolbar machineToolbar;
-    Button runOneTime, runMicroStep, runContinously;
+    Button runOneTime, runMicroStep, runContinously, runFromState;
     CheckBox decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay;
     private final int FILE_OPEN_REQUEST = 4;
-    Uri fileUri;
+    Uri inputFileUri, outputFileUri;
     MipsMachine mipsMachine;
     MachineInterface machineInterface;
     InputStream fileInputStream;
@@ -84,6 +86,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         runOneTime = findViewById(R.id.runStepButton);
         runMicroStep = findViewById(R.id.runMicroStepButton);
         runContinously = findViewById(R.id.runContinouslyButton);
+        runFromState = findViewById(R.id.runStateButton);
 
         // Set Checkboxes
         decimalMode = findViewById(R.id.decimialDisplayMode);
@@ -107,6 +110,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         runMicroStep.setOnClickListener(runMicroStepListener);
         runOneTime.setOnClickListener(runOneStepListener);
         runContinously.setOnClickListener(runContinuouslyListener);
+        runFromState.setOnClickListener(runFromStateListener);
     }
 
     // Create Mips Machine method
@@ -146,16 +150,26 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             createMipsMachine();
             return true;
         }
+        if (item.getItemId() == R.id.saveState) {
+            createOutputStream();
+        }
         return false;
+    }
+
+    private void createOutputStream() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.setType("text/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(intent, Reference.CREATE_OUTPUTSTREAM);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK && requestCode == FILE_OPEN_REQUEST) {
             if (data != null) {
-                fileUri = data.getData();
+                inputFileUri = data.getData();
                 try {
-                    fileInputStream = getContentResolver().openInputStream(fileUri);
+                    fileInputStream = getContentResolver().openInputStream(inputFileUri);
                     Log.d("Opening file", "Opened file");
                     mipsMachine.setInputFileStream(fileInputStream);
                     gotInputStream = true;
@@ -164,7 +178,19 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
-        } else {
+        }
+        if (resultCode == RESULT_OK && requestCode == Reference.CREATE_OUTPUTSTREAM) {
+            if (data != null) {
+                outputFileUri = data.getData();
+                try {
+                    OutputStream outputStream = getContentResolver().openOutputStream(outputFileUri);
+                    mipsMachine.saveState(outputStream);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -260,6 +286,19 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
                 mipsMachine.runContinuously();
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+
+    View.OnClickListener runFromStateListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (FileUtils.getFileName(MachineActivity.this, inputFileUri).contains(".mst")) {
+                mipsMachine.readState();
+                Log.d("State", "Reading in the state");
+            } else {
+                Toast.makeText(MachineActivity.this, "Wrong file", Toast.LENGTH_SHORT).show();
             }
         }
     };
