@@ -108,7 +108,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         // Init the displays
         machineInterface.clearAll();    // Clear the display to display proper register names
         hexMode.setChecked(true);   // Set the default memory display mode to be hex
-        mipsMachine.setMemoryFormat(Reference.HEX_MODE);
+        mipsMachine.setDisplayFormat(Reference.HEX_MODE);
         mipsMachine.sendMemory();   // Show blank memory to display
 
         // Set buttons and checkboxes to their listeners
@@ -218,7 +218,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         // Reset the machine by creating new object with the same reference name
         createMipsMachine();
 
-        mipsMachine.setMemoryFormat(getDisplayMode());  // Provide the display mode to the machine
+        mipsMachine.setDisplayFormat(getDisplayMode());  // Provide the display mode to the machine
 
         // Clear the displays
         machineInterface.clearAll();
@@ -291,7 +291,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             binaryMode.setChecked(false);
 
             // Tell MipsMachine the memory display option
-            mipsMachine.setMemoryFormat(Reference.HEX_MODE);
+            mipsMachine.setDisplayFormat(Reference.HEX_MODE);
             mipsMachine.sendMemory();
         }
     };
@@ -304,7 +304,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             binaryMode.setChecked(false);
 
             // Tell MipsMachine the memory display option
-            mipsMachine.setMemoryFormat(Reference.DECIMIAL_MODE);
+            mipsMachine.setDisplayFormat(Reference.DECIMIAL_MODE);
             mipsMachine.sendMemory();
         }
     };
@@ -317,7 +317,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             hexMode.setChecked(false);
 
             // Tell MipsMachine the memory display option
-            mipsMachine.setMemoryFormat(Reference.BINARY_MODE);
+            mipsMachine.setDisplayFormat(Reference.BINARY_MODE);
             mipsMachine.sendMemory();
         }
     };

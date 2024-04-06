@@ -14,15 +14,11 @@
 
 package io.github.danielt3131.mipsemu.machine;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +50,7 @@ public class MipsMachine {
 
     private MachineInterface machineInterface;
     private InputStream inputFileStream;
-    private int memoryFormat;
+    private int displayFormat;
     private Scanner fileScanner;
 
     /**
@@ -80,8 +76,12 @@ public class MipsMachine {
         }
     }
 
-    public void setMemoryFormat(int memoryFormat) {
-        this.memoryFormat = memoryFormat;
+    /**
+     * Sets the display format
+     * @param displayFormat The format specifier defined in {@link Reference}
+     */
+    public void setDisplayFormat(int displayFormat) {
+        this.displayFormat = displayFormat;
     }
 
     /**
@@ -495,11 +495,11 @@ public class MipsMachine {
      */
     public void sendMemory() {
         String memoryStr = "";
-        if (memoryFormat == Reference.HEX_MODE) {
+        if (displayFormat == Reference.HEX_MODE) {
             memoryStr = HexFormat.ofDelimiter(" ").formatHex(memory);
-        } else if (memoryFormat == Reference.BINARY_MODE) {
+        } else if (displayFormat == Reference.BINARY_MODE) {
             memoryStr = new BigInteger(memory).toString();
-        } else if (memoryFormat == Reference.DECIMIAL_MODE) {
+        } else if (displayFormat == Reference.DECIMIAL_MODE) {
             memoryStr = Arrays.toString(memory);
         }
         // Pass the memoryStr to update memory
