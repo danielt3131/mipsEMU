@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import io.github.danielt3131.mipsemu.FileUtils;
 import io.github.danielt3131.mipsemu.MachineInterface;
 import io.github.danielt3131.mipsemu.R;
 import io.github.danielt3131.mipsemu.Reference;
@@ -53,7 +52,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     Toolbar machineToolbar;
     Button runOneTime, runMicroStep, runContinously;
     CheckBox decimalMode, binaryMode, hexMode;
-    TextView memoryDisplay, programCounterDisplay, instructionDisplay;
+    TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
     TextView[] registerDispalys;
     private final int FILE_OPEN_REQUEST = 4;
     Uri inputFileUri, outputFileUri;
@@ -82,6 +81,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         memoryDisplay = findViewById(R.id.memoryView);
         programCounterDisplay = findViewById(R.id.programCounterDisplay);
         instructionDisplay = findViewById(R.id.instructionDisplay);
+        cacheHitRateDisplay = findViewById(R.id.cacheHitRate);
 
         // Inflate the registers
         inflateRegisters();
@@ -100,7 +100,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         setSupportActionBar(machineToolbar);
 
         // Create Machine interface
-        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDispalys);
+        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDispalys, cacheHitRateDisplay);
 
         // Create the machine
         createMipsMachine();

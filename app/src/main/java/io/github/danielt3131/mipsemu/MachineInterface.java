@@ -9,7 +9,7 @@ import android.widget.TextView;
  * Class used for communication from {@link io.github.danielt3131.mipsemu.machine.MipsMachine} to {@link io.github.danielt3131.mipsemu.ui.MachineActivity}
  */
 public class MachineInterface {
-    private TextView memoryDisplay, programCounterDisplay, instructionDisplay;
+    private TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
     private TextView[] registers;
 
     /**
@@ -18,12 +18,14 @@ public class MachineInterface {
      * @param programCounterDisplay The program counter display
      * @param instructionDisplay The instruction display
      * @param registers The array of registers
+     * @param cacheHitRateDisplay The cache hit rate display
      */
-    public MachineInterface(TextView memoryDisplay, TextView programCounterDisplay, TextView instructionDisplay, TextView[] registers) {
+    public MachineInterface(TextView memoryDisplay, TextView programCounterDisplay, TextView instructionDisplay, TextView[] registers, TextView cacheHitRateDisplay) {
         this.memoryDisplay = memoryDisplay;
         this.programCounterDisplay = programCounterDisplay;
         this.instructionDisplay = instructionDisplay;
         this.registers = registers;
+        this.cacheHitRateDisplay = cacheHitRateDisplay;
     }
 
     /**
@@ -73,5 +75,13 @@ public class MachineInterface {
                 Log.e("Update Register", e.getMessage());
             }
         }
+    }
+
+    /**
+     * Updates the cache hit display
+     * @param cacheHitRate The cache hit rate value
+     */
+    public void updateCacheHitDisplay(String cacheHitRate) {
+        cacheHitRateDisplay.setText("Cache Hits: " + cacheHitRate);
     }
 }
