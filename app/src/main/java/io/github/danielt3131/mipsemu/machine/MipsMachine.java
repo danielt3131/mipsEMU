@@ -257,8 +257,9 @@ public class MipsMachine {
                 }
                 else if(mstep == 4)
                 {
-                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", register[t] + register[s], d));
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] + register[s], Reference.registerNames[d]));
                     register[d] = register[s] + register[t];
+                    sendIndividualRegisterToDisplay(d);
                     mstep++;
                     return 0;
                 }
@@ -306,8 +307,9 @@ public class MipsMachine {
                 }
                 else if(mstep == 4)
                 {
-                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", register[t] - register[s], d));
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] - register[s], Reference.registerNames[d]));
                     register[d] = register[s] - register[t];
+                    sendIndividualRegisterToDisplay(d);
                     mstep++;
                     return 0;
                 }
@@ -363,8 +365,9 @@ public class MipsMachine {
                 }
                 else if(mstep == 4)
                 {
-                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", i + register[s], t));
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", i + register[s], Reference.registerNames[t]));
                     register[t] = register[s] + i;
+                    sendIndividualRegisterToDisplay(t);
                     mstep++;
                     return 0;
                 }
@@ -523,5 +526,30 @@ public class MipsMachine {
         StateManager.toFile(outputStream, register, pc, hi, lo, memory);
     }
 
+    /**
+     * Method to send a individual register to {@link MachineInterface} with the correct format
+     * @param registerIndex The register to select from in the register array
+     */
+    private void sendIndividualRegisterToDisplay(int registerIndex) {
+        String registerString = "";
+        if (displayFormat == Reference.HEX_MODE) {
+            registerString = Integer.toHexString(register[registerIndex]);
+            //registerString = HexFormat.ofDelimiter("").formatHex(new byte[] {Byte.parseByte(String.valueOf(register[registerIndex]))}, registerIndex, registerIndex);
+        } else if (displayFormat == Reference.BINARY_MODE) {
+            registerString = Integer.toBinaryString(register[registerIndex]);
+        } else {
+            registerString = String.valueOf(register[registerIndex]);
+        }
+        machineInterface.updateIndividualRegister(registerIndex, registerString);
+    }
+
+    /**
+     * Method to update all the register displays by calling sendIndividualRegisterToDisplay
+     */
+    public void sendAllRegistersToDisplay() {
+        for (int i = 0; i < register.length; i++) {
+            sendIndividualRegisterToDisplay(i);
+        }
+    }
 
 }

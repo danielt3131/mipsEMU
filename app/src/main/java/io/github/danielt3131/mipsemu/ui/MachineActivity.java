@@ -110,6 +110,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         hexMode.setChecked(true);   // Set the default memory display mode to be hex
         mipsMachine.setDisplayFormat(Reference.HEX_MODE);
         mipsMachine.sendMemory();   // Show blank memory to display
+        mipsMachine.sendAllRegistersToDisplay();
 
         // Set buttons and checkboxes to their listeners
         decimalMode.setOnClickListener(decimalModeListener);
@@ -293,6 +294,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             // Tell MipsMachine the memory display option
             mipsMachine.setDisplayFormat(Reference.HEX_MODE);
             mipsMachine.sendMemory();
+            mipsMachine.sendAllRegistersToDisplay();
         }
     };
 
@@ -306,6 +308,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             // Tell MipsMachine the memory display option
             mipsMachine.setDisplayFormat(Reference.DECIMIAL_MODE);
             mipsMachine.sendMemory();
+            mipsMachine.sendAllRegistersToDisplay();
         }
     };
 
@@ -319,6 +322,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             // Tell MipsMachine the memory display option
             mipsMachine.setDisplayFormat(Reference.BINARY_MODE);
             mipsMachine.sendMemory();
+            mipsMachine.sendAllRegistersToDisplay();
         }
     };
 
