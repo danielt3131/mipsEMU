@@ -193,17 +193,24 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             return true;
         }
         if (item.getItemId() == R.id.machineReset) {
-            mipsMachine = null; // Deallocate the object
-            System.gc();// Call the garbage collector to clean up mipsMachine
-            gotInputStream = false;
-            // Reset the machine by creating new object with the same reference name
-            createMipsMachine();
+            resetMachine();
             return true;
         }
         if (item.getItemId() == R.id.saveState) {
             createOutputStream();
         }
         return false;
+    }
+
+    /**
+     * Method to reset the machine
+     */
+    private void resetMachine() {
+        mipsMachine = null; // Deallocate the object
+        System.gc();// Call the garbage collector to clean up mipsMachine
+        gotInputStream = false;
+        // Reset the machine by creating new object with the same reference name
+        createMipsMachine();
     }
 
     private void createOutputStream() {
