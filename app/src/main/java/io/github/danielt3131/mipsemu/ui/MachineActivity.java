@@ -105,6 +105,12 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         // Create the machine
         createMipsMachine();
 
+        // Init the displays
+        machineInterface.clearAll();    // Clear the display to display proper register names
+        hexMode.setChecked(true);   // Set the default memory display mode to be hex
+        mipsMachine.setMemoryFormat(Reference.HEX_MODE);
+        mipsMachine.sendMemory();   // Show blank memory to display
+
         // Set buttons and checkboxes to their listeners
         decimalMode.setOnClickListener(decimalModeListener);
         hexMode.setOnClickListener(hexModeListener);
