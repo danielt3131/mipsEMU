@@ -501,12 +501,44 @@ public class MipsMachine {
         if (displayFormat == Reference.HEX_MODE) {
             memoryStr = HexFormat.ofDelimiter(" ").formatHex(memory);
         } else if (displayFormat == Reference.BINARY_MODE) {
-            memoryStr = new BigInteger(memory).toString();
+            memoryStr = binaryString();
         } else if (displayFormat == Reference.DECIMIAL_MODE) {
             memoryStr = Arrays.toString(memory);
         }
         // Pass the memoryStr to update memory
         machineInterface.updateMemoryDisplay(memoryStr);
+    }
+
+//    private String binaryString() {
+//        String memoryBinaryString = new BigInteger(memory).toString(2); // Memory as a binary formatted string
+//        // Add spaces between each byte
+//        String memoryBinaryStringSpaced = "";
+//        for (int i = 0; i < memoryBinaryString.length(); i++) {
+//
+//            if ((i % 8 == 0 || i == 7) && i != 0) {
+//                memoryBinaryStringSpaced = memoryBinaryStringSpaced + memoryBinaryString.charAt(i) + " ";
+//            } else {
+//                memoryBinaryStringSpaced = memoryBinaryStringSpaced + memoryBinaryString.charAt(i);
+//            }
+//        }
+//        return memoryBinaryStringSpaced;
+//
+//    }
+
+    /**
+     * Method to get a binary formatted string representing the memory
+     * @return The memory formatted as binary with a space between every byte
+     */
+    private String binaryString() {
+        byte[] indivByte = new byte[1];
+        String memoryString = "";
+        for (int i = 0; i < memory.length; i++) {
+            indivByte[0] = memory[i];
+            BigInteger getBinary = new BigInteger(indivByte);
+            // Add leading zeros and space -> 00101010 01110001 versus 1010101110001
+            memoryString = memoryString + String.format("%8s", getBinary.toString(2)).replace(" ", "0") + " ";
+        }
+       return memoryString;
     }
 
     public void sendToDisplay(String message)
