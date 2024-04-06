@@ -466,7 +466,19 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="AT" />
+
         </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/cacheHitRate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cache Hit Rate" />
 
     </LinearLayout>
 
