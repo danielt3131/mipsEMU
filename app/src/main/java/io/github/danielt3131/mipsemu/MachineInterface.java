@@ -84,4 +84,20 @@ public class MachineInterface {
     public void updateCacheHitDisplay(String cacheHitRate) {
         cacheHitRateDisplay.setText("Cache Hits: " + cacheHitRate);
     }
+
+    /**
+     * Method to clear all the displays when the machine is reset
+     */
+    public void clearAll() {
+        String blank = "";
+        String[] blankRegisters = new String[registers.length];
+        for (int i = 0; i < blankRegisters.length; i++) {
+            blankRegisters[i] = blank;
+        }
+        updateAllRegisters(blankRegisters);
+        updateProgramCounter(blank);
+        updateCacheHitDisplay(blank);
+        updateMemoryDisplay(blank);
+        updateInstructionDisplay(blank);
+    }
 }

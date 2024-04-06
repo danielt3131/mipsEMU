@@ -208,9 +208,32 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     private void resetMachine() {
         mipsMachine = null; // Deallocate the object
         System.gc();// Call the garbage collector to clean up mipsMachine
-        gotInputStream = false;
+        gotInputStream = false; // Require a new file selection
         // Reset the machine by creating new object with the same reference name
         createMipsMachine();
+
+        mipsMachine.setMemoryFormat(getDisplayMode());  // Provide the display mode to the machine
+
+        // Clear the displays
+        machineInterface.clearAll();
+
+        // Send the blank memory to be displayed
+        mipsMachine.sendMemory();
+
+    }
+
+    /**
+     * Method to get the current display mode hex, binary, or decimal
+     * @return The display mode
+     */
+    private int getDisplayMode() {
+        if (binaryMode.isChecked()) {
+            return Reference.BINARY_MODE;
+        } else if (hexMode.isChecked()) {
+            return Reference.HEX_MODE;
+        } else {
+            return Reference.DECIMIAL_MODE;
+        }
     }
 
     private void createOutputStream() {
