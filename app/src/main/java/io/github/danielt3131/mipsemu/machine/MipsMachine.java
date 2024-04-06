@@ -509,21 +509,6 @@ public class MipsMachine {
         machineInterface.updateMemoryDisplay(memoryStr);
     }
 
-//    private String binaryString() {
-//        String memoryBinaryString = new BigInteger(memory).toString(2); // Memory as a binary formatted string
-//        // Add spaces between each byte
-//        String memoryBinaryStringSpaced = "";
-//        for (int i = 0; i < memoryBinaryString.length(); i++) {
-//
-//            if ((i % 8 == 0 || i == 7) && i != 0) {
-//                memoryBinaryStringSpaced = memoryBinaryStringSpaced + memoryBinaryString.charAt(i) + " ";
-//            } else {
-//                memoryBinaryStringSpaced = memoryBinaryStringSpaced + memoryBinaryString.charAt(i);
-//            }
-//        }
-//        return memoryBinaryStringSpaced;
-//
-//    }
 
     /**
      * Method to get a binary formatted string representing the memory
