@@ -441,6 +441,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="10dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -471,8 +472,7 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:layout_weight="1" />
+            android:layout_height="25dp" />
 
         <TextView
             android:id="@+id/cacheHitRate"
