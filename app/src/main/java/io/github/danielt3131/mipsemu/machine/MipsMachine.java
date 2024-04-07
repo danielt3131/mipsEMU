@@ -14,11 +14,11 @@
 
 package io.github.danielt3131.mipsemu.machine;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +50,8 @@ public class MipsMachine {
 
     private MachineInterface machineInterface;
     private InputStream inputFileStream;
-    private int memoryFormat;
+    private int displayFormat;
+    private Scanner fileScanner;
 
     /**
      * Constructor for the mips emulator
@@ -67,20 +68,29 @@ public class MipsMachine {
 
     public void setInputFileStream(InputStream inputFileStream) {
         this.inputFileStream = inputFileStream;
+        fileScanner = new Scanner(inputFileStream);
+        if (fileScanner.hasNext("State")) {
+            readState();
+        } else {
+            readFile();
+        }
     }
 
-    public void setMemoryFormat(int memoryFormat) {
-        this.memoryFormat = memoryFormat;
+    /**
+     * Sets the display format
+     * @param displayFormat The format specifier defined in {@link Reference}
+     */
+    public void setDisplayFormat(int displayFormat) {
+        this.displayFormat = displayFormat;
     }
 
     /**
      * Reads in a file and puts the instructions into memory
      */
-    public void readFile() throws FileNotFoundException {
+    public void readFile() {
 
         int tp = 0; //tp for text pointer : where to place word in text block of memory
 
-        Scanner fileScanner = new Scanner(inputFileStream);
 
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
@@ -126,20 +136,63 @@ public class MipsMachine {
         }
     }
 
+    /**
+     * reads from file a state and loads it into machine
+     */
+    public void readState()
+    {
+
+        //reads register
+        for(int i = 0; i < 32; i++)
+        {
+            register[i] = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        }
+        //reads pc, hi, lo
+
+        pc = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        hi = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        lo = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+
+        //reads amount of memory
+        int memSize = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        memory = new byte[memSize];
+
+        //sets the stack
+        int stackSize = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        for(int i = memSize; i > memSize - stackSize; i--)
+        {
+            memory[i] = fileScanner.nextByte();
+        }
+
+        //sets the text
+        int textSize = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        for(int i = 0; i < textSize; i++)
+        {
+            memory[i] = fileScanner.nextByte();
+        }
+
+    }
+
+    private int getCode()
+    {
+        return combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
+    }
 
     private int mstep; //the micro step to run
+    private int code; //the instruction word to run
+    private boolean needNext; //determines if nextMicroStep needs to update code
 
     /**
      * has the machine read from the program counter to fetch and execute the next instruction
      */
     private void nextStep() {
         //combines the 4 bytes into the full word
-        int code = combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
+        code = getCode();
         Log.d("Code", Integer.toBinaryString(code));
         boolean running = true;
         while(running) //keeps executing until it returns EOS when step is done
         {
-            running = nextMicroStep(code) != EOS;
+            running = nextMicroStep() != EOS;
         }
     }
 
@@ -154,14 +207,14 @@ public class MipsMachine {
      * Method to run next micro step as requested from the user or MipsMachine
      */
     public void runNextMicroStep() {
-        // Run the next microstep
+        nextMicroStep();
     }
 
     public void runContinuously() {
         // Run continuously
     }
 
-    private int nextMicroStep(int code)
+    private int nextMicroStep()
     {
         Log.d("mstep", "MSTEP: " + mstep);
 
@@ -204,8 +257,9 @@ public class MipsMachine {
                 }
                 else if(mstep == 4)
                 {
-                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", register[t] + register[s], d));
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] + register[s], Reference.registerNames[d]));
                     register[d] = register[s] + register[t];
+                    sendIndividualRegisterToDisplay(d);
                     mstep++;
                     return 0;
                 }
@@ -214,6 +268,57 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
+                    return EOS;
+                }
+
+
+            }
+
+            //Subtract
+            else if(grabRightBits(code,6) == 0b1000010)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"sub\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] - register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] - register[s], Reference.registerNames[d]));
+                    register[d] = register[s] - register[t];
+                    sendIndividualRegisterToDisplay(d);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    needNext = true;
                     return EOS;
                 }
 
@@ -260,8 +365,9 @@ public class MipsMachine {
                 }
                 else if(mstep == 4)
                 {
-                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", i + register[s], t));
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", i + register[s], Reference.registerNames[t]));
                     register[t] = register[s] + i;
+                    sendIndividualRegisterToDisplay(t);
                     mstep++;
                     return 0;
                 }
@@ -392,15 +498,32 @@ public class MipsMachine {
      */
     public void sendMemory() {
         String memoryStr = "";
-        if (memoryFormat == Reference.HEX_MODE) {
+        if (displayFormat == Reference.HEX_MODE) {
             memoryStr = HexFormat.ofDelimiter(" ").formatHex(memory);
-        } else if (memoryFormat == Reference.BINARY_MODE) {
-            memoryStr = new BigInteger(memory).toString();
-        } else if (memoryFormat == Reference.DECIMIAL_MODE) {
+        } else if (displayFormat == Reference.BINARY_MODE) {
+            memoryStr = binaryString();
+        } else if (displayFormat == Reference.DECIMIAL_MODE) {
             memoryStr = Arrays.toString(memory);
         }
         // Pass the memoryStr to update memory
         machineInterface.updateMemoryDisplay(memoryStr);
+    }
+
+
+    /**
+     * Method to get a binary formatted string representing the memory
+     * @return The memory formatted as binary with a space between every byte
+     */
+    private String binaryString() {
+        byte[] indivByte = new byte[1];
+        String memoryString = "";
+        for (int i = 0; i < memory.length; i++) {
+            indivByte[0] = memory[i];
+            BigInteger getBinary = new BigInteger(indivByte);
+            // Add leading zeros and space -> 00101010 01110001 versus 1010101110001
+            memoryString = memoryString + String.format("%8s", getBinary.toString(2)).replace(" ", "0") + " ";
+        }
+       return memoryString;
     }
 
     public void sendToDisplay(String message)
@@ -410,5 +533,40 @@ public class MipsMachine {
         machineInterface.updateInstructionDisplay(message);
     }
 
+    public void saveState(OutputStream outputStream) throws IOException {
+        // Write header
+//        PrintWriter printWriter = new PrintWriter(outputStream);
+//        printWriter.println("State");
+//        printWriter.close();
+        // Save the save
+        Log.d("saveState", "Starting to save the state");
+        StateManager.toFile(outputStream, register, pc, hi, lo, memory);
+    }
+
+    /**
+     * Method to send a individual register to {@link MachineInterface} with the correct format
+     * @param registerIndex The register to select from in the register array
+     */
+    private void sendIndividualRegisterToDisplay(int registerIndex) {
+        String registerString = "";
+        if (displayFormat == Reference.HEX_MODE) {
+            registerString = String.format("%8s", Integer.toHexString(register[registerIndex])).replace(" ", "0");  // 4 bytes -> 2 hex per byte  = 8
+            //registerString = HexFormat.ofDelimiter("").formatHex(new byte[] {Byte.parseByte(String.valueOf(register[registerIndex]))}, registerIndex, registerIndex);
+        } else if (displayFormat == Reference.BINARY_MODE) {
+            registerString = String.format("%32s", Integer.toBinaryString(register[registerIndex])).replace(" ", "0");  // 4 bytes = 32 bits
+        } else {
+            registerString = String.valueOf(register[registerIndex]);
+        }
+        machineInterface.updateIndividualRegister(registerIndex, registerString);
+    }
+
+    /**
+     * Method to update all the register displays by calling sendIndividualRegisterToDisplay
+     */
+    public void sendAllRegistersToDisplay() {
+        for (int i = 0; i < register.length; i++) {
+            sendIndividualRegisterToDisplay(i);
+        }
+    }
 
 }

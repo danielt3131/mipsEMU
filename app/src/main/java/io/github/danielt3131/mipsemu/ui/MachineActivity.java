@@ -15,7 +15,6 @@ package io.github.danielt3131.mipsemu.ui;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -39,7 +38,9 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.DialogFragment;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import io.github.danielt3131.mipsemu.MachineInterface;
 import io.github.danielt3131.mipsemu.R;
@@ -51,9 +52,10 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     Toolbar machineToolbar;
     Button runOneTime, runMicroStep, runContinously;
     CheckBox decimalMode, binaryMode, hexMode;
-    TextView memoryDisplay, programCounterDisplay, instructionDisplay;
+    TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
+    TextView[] registerDispalys;
     private final int FILE_OPEN_REQUEST = 4;
-    Uri fileUri;
+    Uri inputFileUri, outputFileUri;
     MipsMachine mipsMachine;
     MachineInterface machineInterface;
     InputStream fileInputStream;
@@ -79,6 +81,10 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         memoryDisplay = findViewById(R.id.memoryView);
         programCounterDisplay = findViewById(R.id.programCounterDisplay);
         instructionDisplay = findViewById(R.id.instructionDisplay);
+        cacheHitRateDisplay = findViewById(R.id.cacheHitRate);
+
+        // Inflate the registers
+        inflateRegisters();
 
         // Set buttons
         runOneTime = findViewById(R.id.runStepButton);
@@ -94,10 +100,17 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         setSupportActionBar(machineToolbar);
 
         // Create Machine interface
-        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay);
+        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDispalys, cacheHitRateDisplay);
 
         // Create the machine
         createMipsMachine();
+
+        // Init the displays
+        machineInterface.clearAll();    // Clear the display to display proper register names
+        hexMode.setChecked(true);   // Set the default memory display mode to be hex
+        mipsMachine.setDisplayFormat(Reference.HEX_MODE);
+        mipsMachine.sendMemory();   // Show blank memory to display
+        mipsMachine.sendAllRegistersToDisplay();
 
         // Set buttons and checkboxes to their listeners
         decimalMode.setOnClickListener(decimalModeListener);
@@ -113,6 +126,53 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
     private void createMipsMachine() {
         mipsMachine = new MipsMachine(2000, machineInterface);
+    }
+
+    /**
+     * Creates register text view array and set each element to its text view
+     */
+    private void inflateRegisters() {
+        registerDispalys = new TextView[32];    // The number of registers
+        registerDispalys[Reference.REGISTER_ZERO] = findViewById(R.id.register_ZERO);
+
+        registerDispalys[Reference.REGISTER_V0] = findViewById(R.id.register_V0);
+        registerDispalys[Reference.REGISTER_V1] = findViewById(R.id.register_V1);
+
+        registerDispalys[Reference.REGISTER_T0] = findViewById(R.id.register_T0);
+        registerDispalys[Reference.REGISTER_T1] = findViewById(R.id.register_T1);
+        registerDispalys[Reference.REGISTER_T2] = findViewById(R.id.register_T2);
+        registerDispalys[Reference.REGISTER_T3] = findViewById(R.id.register_T3);
+        registerDispalys[Reference.REGISTER_T4] = findViewById(R.id.register_T4);
+        registerDispalys[Reference.REGISTER_T5] = findViewById(R.id.register_T5);
+        registerDispalys[Reference.REGISTER_T6] = findViewById(R.id.register_T6);
+        registerDispalys[Reference.REGISTER_T7] = findViewById(R.id.register_T7);
+        registerDispalys[Reference.REGISTER_T8] = findViewById(R.id.register_T8);
+        registerDispalys[Reference.REGISTER_T9] = findViewById(R.id.register_T9);
+
+        registerDispalys[Reference.REGISTER_A0] = findViewById(R.id.register_A0);
+        registerDispalys[Reference.REGISTER_A1] = findViewById(R.id.register_A1);
+        registerDispalys[Reference.REGISTER_A2] = findViewById(R.id.register_A2);
+        registerDispalys[Reference.REGISTER_A3] = findViewById(R.id.register_A3);
+
+        registerDispalys[Reference.REGISTER_K0] = findViewById(R.id.register_K0);
+        registerDispalys[Reference.REGISTER_K1] = findViewById(R.id.register_K1);
+
+        registerDispalys[Reference.REGISTER_S0] = findViewById(R.id.register_S0);
+        registerDispalys[Reference.REGISTER_S1] = findViewById(R.id.register_S1);
+        registerDispalys[Reference.REGISTER_S2] = findViewById(R.id.register_S2);
+        registerDispalys[Reference.REGISTER_S3] = findViewById(R.id.register_S3);
+        registerDispalys[Reference.REGISTER_S4] = findViewById(R.id.register_S4);
+        registerDispalys[Reference.REGISTER_S5] = findViewById(R.id.register_S5);
+        registerDispalys[Reference.REGISTER_S6] = findViewById(R.id.register_S6);
+        registerDispalys[Reference.REGISTER_S7] = findViewById(R.id.register_S7);
+
+        registerDispalys[Reference.REGISTER_FP] = findViewById(R.id.register_FP);
+        registerDispalys[Reference.REGISTER_SP] = findViewById(R.id.register_SP);
+        registerDispalys[Reference.REGISTER_GP] = findViewById(R.id.register_GP);
+        registerDispalys[Reference.REGISTER_RA] = findViewById(R.id.register_RA);
+        registerDispalys[Reference.REGISTER_AT] = findViewById(R.id.register_AT);
+
+
     }
 
     // Create the menu options in the toolbar
@@ -140,22 +200,63 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             return true;
         }
         if (item.getItemId() == R.id.machineReset) {
-            mipsMachine = null; // Deallocate the object
-            System.gc();    // Call the garbage collector to clean up mipsMachine
-            // Reset the machine by creating new object with the same reference name
-            createMipsMachine();
+            resetMachine();
             return true;
         }
+        if (item.getItemId() == R.id.saveState) {
+            createOutputStream();
+        }
         return false;
+    }
+
+    /**
+     * Method to reset the machine
+     */
+    private void resetMachine() {
+        mipsMachine = null; // Deallocate the object
+        System.gc();// Call the garbage collector to clean up mipsMachine
+        gotInputStream = false; // Require a new file selection
+        // Reset the machine by creating new object with the same reference name
+        createMipsMachine();
+
+        mipsMachine.setDisplayFormat(getDisplayMode());  // Provide the display mode to the machine
+
+        // Clear the displays
+        machineInterface.clearAll();
+
+        // Send the blank memory to be displayed
+        mipsMachine.sendMemory();
+
+    }
+
+    /**
+     * Method to get the current display mode hex, binary, or decimal
+     * @return The display mode
+     */
+    private int getDisplayMode() {
+        if (binaryMode.isChecked()) {
+            return Reference.BINARY_MODE;
+        } else if (hexMode.isChecked()) {
+            return Reference.HEX_MODE;
+        } else {
+            return Reference.DECIMIAL_MODE;
+        }
+    }
+
+    private void createOutputStream() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.setType("text/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(intent, Reference.CREATE_OUTPUTSTREAM);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK && requestCode == FILE_OPEN_REQUEST) {
             if (data != null) {
-                fileUri = data.getData();
+                inputFileUri = data.getData();
                 try {
-                    fileInputStream = getContentResolver().openInputStream(fileUri);
+                    fileInputStream = getContentResolver().openInputStream(inputFileUri);
                     Log.d("Opening file", "Opened file");
                     mipsMachine.setInputFileStream(fileInputStream);
                     gotInputStream = true;
@@ -164,11 +265,22 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
-        } else {
+        }
+        if (resultCode == RESULT_OK && requestCode == Reference.CREATE_OUTPUTSTREAM) {
+            if (data != null) {
+                outputFileUri = data.getData();
+                try {
+                    OutputStream outputStream = getContentResolver().openOutputStream(outputFileUri);
+                    mipsMachine.saveState(outputStream);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
     /**
      * Listeners for all checkboxes
      */
@@ -180,8 +292,9 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             binaryMode.setChecked(false);
 
             // Tell MipsMachine the memory display option
-            mipsMachine.setMemoryFormat(Reference.HEX_MODE);
+            mipsMachine.setDisplayFormat(Reference.HEX_MODE);
             mipsMachine.sendMemory();
+            mipsMachine.sendAllRegistersToDisplay();
         }
     };
 
@@ -193,8 +306,9 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             binaryMode.setChecked(false);
 
             // Tell MipsMachine the memory display option
-            mipsMachine.setMemoryFormat(Reference.DECIMIAL_MODE);
+            mipsMachine.setDisplayFormat(Reference.DECIMIAL_MODE);
             mipsMachine.sendMemory();
+            mipsMachine.sendAllRegistersToDisplay();
         }
     };
 
@@ -206,8 +320,9 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             hexMode.setChecked(false);
 
             // Tell MipsMachine the memory display option
-            mipsMachine.setMemoryFormat(Reference.BINARY_MODE);
+            mipsMachine.setDisplayFormat(Reference.BINARY_MODE);
             mipsMachine.sendMemory();
+            mipsMachine.sendAllRegistersToDisplay();
         }
     };
 
