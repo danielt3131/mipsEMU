@@ -550,10 +550,10 @@ public class MipsMachine {
     private void sendIndividualRegisterToDisplay(int registerIndex) {
         String registerString = "";
         if (displayFormat == Reference.HEX_MODE) {
-            registerString = Integer.toHexString(register[registerIndex]);
+            registerString = String.format("%8s", Integer.toHexString(register[registerIndex])).replace(" ", "0");  // 4 bytes -> 2 hex per byte  = 8
             //registerString = HexFormat.ofDelimiter("").formatHex(new byte[] {Byte.parseByte(String.valueOf(register[registerIndex]))}, registerIndex, registerIndex);
         } else if (displayFormat == Reference.BINARY_MODE) {
-            registerString = Integer.toBinaryString(register[registerIndex]);
+            registerString = String.format("%32s", Integer.toBinaryString(register[registerIndex])).replace(" ", "0");  // 4 bytes = 32 bits
         } else {
             registerString = String.valueOf(register[registerIndex]);
         }
