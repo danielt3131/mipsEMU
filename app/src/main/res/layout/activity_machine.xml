@@ -162,12 +162,22 @@
                     android:layout_weight="1"
                     android:text="Program Counter:" />
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/register_SP"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="$sp" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_FP"
@@ -176,12 +186,22 @@
                     android:layout_weight="1"
                     android:text="$fp" />
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/register_ZERO"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Zero" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_V0"
@@ -190,12 +210,22 @@
                     android:layout_weight="1"
                     android:text="V0" />
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/register_V1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="V1" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_A0"
@@ -204,12 +234,22 @@
                     android:layout_weight="1"
                     android:text="A0" />
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/register_A1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="A1" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_A2"
@@ -218,6 +258,11 @@
                     android:layout_weight="1"
                     android:text="A2" />
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/register_A3"
                     android:layout_width="match_parent"
@@ -225,12 +270,21 @@
                     android:layout_weight="1"
                     android:text="A3" />
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/register_T0"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T0" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_T1"
@@ -238,6 +292,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T1" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_T2"
@@ -245,6 +303,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T2" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_T3"
@@ -252,6 +314,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T3" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_T4"
@@ -259,6 +325,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T4" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_T5"
@@ -266,6 +336,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T5" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_T6"
@@ -273,6 +347,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T6" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_T7"
@@ -280,6 +358,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T7" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_T8"
@@ -287,6 +369,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T8" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_T9"
@@ -294,6 +380,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T9" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_S0"
@@ -301,6 +391,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S0" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_S1"
@@ -308,6 +402,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S1" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_S2"
@@ -315,6 +413,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S2" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_S3"
@@ -322,6 +424,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S3" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_S4"
@@ -329,6 +435,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S4" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_S5"
@@ -336,6 +446,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S5" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_S6"
@@ -343,6 +457,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S6" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_S7"
@@ -350,6 +468,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S7" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_K0"
@@ -357,6 +479,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="K0" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_K1"
@@ -364,6 +490,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="K1" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/register_GP"
@@ -371,20 +501,30 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="GP" />
-
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
                 <TextView
                     android:id="@+id/register_RA"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="RA" />
-
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
                 <TextView
                     android:id="@+id/register_AT"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="AT" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/cacheHitRate"
