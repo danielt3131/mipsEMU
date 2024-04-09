@@ -14,15 +14,11 @@
 
 package io.github.danielt3131.mipsemu.machine;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +50,7 @@ public class MipsMachine {
 
     private MachineInterface machineInterface;
     private InputStream inputFileStream;
-    private int memoryFormat;
+    private int displayFormat;
     private Scanner fileScanner;
 
     /**
@@ -82,8 +78,12 @@ public class MipsMachine {
         }
     }
 
-    public void setMemoryFormat(int memoryFormat) {
-        this.memoryFormat = memoryFormat;
+    /**
+     * Sets the display format
+     * @param displayFormat The format specifier defined in {@link Reference}
+     */
+    public void setDisplayFormat(int displayFormat) {
+        this.displayFormat = displayFormat;
     }
 
     /**
@@ -322,8 +322,9 @@ public class MipsMachine {
                 }
                 else if(mstep == 4)
                 {
-                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", register[t] + register[s], d));
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] + register[s], Reference.registerNames[d]));
                     register[d] = register[s] + register[t];
+                    sendIndividualRegisterToDisplay(d);
                     mstep++;
                     return 0;
                 }
@@ -371,8 +372,9 @@ public class MipsMachine {
                 }
                 else if(mstep == 4)
                 {
-                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", register[t] - register[s], d));
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] - register[s], Reference.registerNames[d]));
                     register[d] = register[s] - register[t];
+                    sendIndividualRegisterToDisplay(d);
                     mstep++;
                     return 0;
                 }
@@ -428,8 +430,9 @@ public class MipsMachine {
                 }
                 else if(mstep == 4)
                 {
-                    sendToDisplay(String.format(Locale.US,"Placing %d in register %d", i + register[s], t));
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", i + register[s], Reference.registerNames[t]));
                     register[t] = register[s] + i;
+                    sendIndividualRegisterToDisplay(t);
                     mstep++;
                     return 0;
                 }
@@ -560,15 +563,32 @@ public class MipsMachine {
      */
     public void sendMemory() {
         String memoryStr = "";
-        if (memoryFormat == Reference.HEX_MODE) {
+        if (displayFormat == Reference.HEX_MODE) {
             memoryStr = HexFormat.ofDelimiter(" ").formatHex(memory);
-        } else if (memoryFormat == Reference.BINARY_MODE) {
-            memoryStr = new BigInteger(memory).toString();
-        } else if (memoryFormat == Reference.DECIMIAL_MODE) {
+        } else if (displayFormat == Reference.BINARY_MODE) {
+            memoryStr = binaryString();
+        } else if (displayFormat == Reference.DECIMIAL_MODE) {
             memoryStr = Arrays.toString(memory);
         }
         // Pass the memoryStr to update memory
         machineInterface.updateMemoryDisplay(memoryStr);
+    }
+
+
+    /**
+     * Method to get a binary formatted string representing the memory
+     * @return The memory formatted as binary with a space between every byte
+     */
+    private String binaryString() {
+        byte[] indivByte = new byte[1];
+        String memoryString = "";
+        for (int i = 0; i < memory.length; i++) {
+            indivByte[0] = memory[i];
+            BigInteger getBinary = new BigInteger(indivByte);
+            // Add leading zeros and space -> 00101010 01110001 versus 1010101110001
+            memoryString = memoryString + String.format("%8s", getBinary.toString(2)).replace(" ", "0") + " ";
+        }
+       return memoryString;
     }
 
     public void sendToDisplay(String message)
@@ -588,5 +608,30 @@ public class MipsMachine {
         StateManager.toFile(outputStream, register, pc, hi, lo, memory);
     }
 
+    /**
+     * Method to send a individual register to {@link MachineInterface} with the correct format
+     * @param registerIndex The register to select from in the register array
+     */
+    private void sendIndividualRegisterToDisplay(int registerIndex) {
+        String registerString = "";
+        if (displayFormat == Reference.HEX_MODE) {
+            registerString = String.format("%8s", Integer.toHexString(register[registerIndex])).replace(" ", "0");  // 4 bytes -> 2 hex per byte  = 8
+            //registerString = HexFormat.ofDelimiter("").formatHex(new byte[] {Byte.parseByte(String.valueOf(register[registerIndex]))}, registerIndex, registerIndex);
+        } else if (displayFormat == Reference.BINARY_MODE) {
+            registerString = String.format("%32s", Integer.toBinaryString(register[registerIndex])).replace(" ", "0");  // 4 bytes = 32 bits
+        } else {
+            registerString = String.valueOf(register[registerIndex]);
+        }
+        machineInterface.updateIndividualRegister(registerIndex, registerString);
+    }
+
+    /**
+     * Method to update all the register displays by calling sendIndividualRegisterToDisplay
+     */
+    public void sendAllRegistersToDisplay() {
+        for (int i = 0; i < register.length; i++) {
+            sendIndividualRegisterToDisplay(i);
+        }
+    }
 
 }
