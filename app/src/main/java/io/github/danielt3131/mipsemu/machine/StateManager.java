@@ -2,12 +2,15 @@ package io.github.danielt3131.mipsemu.machine;
 
 import android.util.Log;
 
+import androidx.annotation.LongDef;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class StateManager
@@ -16,8 +19,8 @@ public class StateManager
     private static ArrayList<Byte> byteArrayList = new ArrayList<>();
 
     /*
-    .mst file breakdown
-    State (Header)
+    file breakdown
+    "State" (Header)
     first 128 bytes determine what is in register
     pc (4 bytes)
     hi (4 bytes)
@@ -34,18 +37,15 @@ public class StateManager
      */
     public static void toFile(OutputStream outputStream, int[] register, int pc, int hi, int lo, byte[] memory) {
         Log.d("StateManager", "Saving state");
-        try {
-            createByteArray(register, pc, hi, lo, memory);
-            byte[] b = new byte[byteArrayList.size()];
-            for (int i = 0; i < b.length; i++) {
-                b[i] = byteArrayList.get(i);
-            }
-            outputStream.write(b, 6, b.length);
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException e) {
-            Log.e("StateManager", e.getMessage());
+        createByteArray(register, pc, hi, lo, memory);
+        PrintWriter write = new PrintWriter(outputStream);
+        write.println("State");
+        for (int i = 0; i < byteArrayList.size(); i++) {
+            write.println(byteArrayList.get(i));
         }
+        write.flush();
+        write.close();
+        Log.d("StateManager", "State saved");
     }
 
     private static byte[] intToBytes(int i)
@@ -116,40 +116,63 @@ public class StateManager
         //Calculating length of text and stack
         int sizeOfText, sizeOfStack;
 
-        int mid = memory[memory.length/2];
-
         //text
 
-        while(memory[mid] == 0)
+        int pointer = memory.length/2;// start at mid point
+        Log.d("mid point", String.valueOf(pointer));
+
+        try {
+            while (memory[pointer] == 0) {
+                pointer--;
+            }
+            sizeOfText = pointer + 1;
+        } catch (ArrayIndexOutOfBoundsException e)
         {
-            mid--;
+            Log.d("Text Empty", "Text Empty");
+            sizeOfText = 0;
         }
-        sizeOfText = mid + 1;
+        Log.d("sizeOfText", "size: " + sizeOfText);
 
         //Stack
 
-        mid = memory[memory.length / 2];
+        pointer = memory.length/2; // start at mid point
+        Log.d("mid point", String.valueOf(pointer));
 
-        while(memory[mid] == 0)
+        try {
+            while (memory[pointer] == 0) {
+                pointer++;
+            }
+            sizeOfStack = memory.length - pointer;
+        } catch(ArrayIndexOutOfBoundsException e)
         {
-            mid++;
+            Log.d("Stack Empty", "Stack Empty");
+            sizeOfStack = 0;
         }
-        sizeOfStack = memory.length - mid + 1;
+        Log.d("sizeOfStack", "size: " + sizeOfStack);
 
         //Now we have sized partitions of the memory
 
         //adding memory partitions to bytearray
+        Log.d("Writing Text", "Starting Text Writing");
+        Log.d("Writing Text", "Starting Text Size");
         addToByteArray(intToBytes(sizeOfText));
+        Log.d("Writing Text", "Writing Text");
         for(int i = 0; i < sizeOfText; i++)
         {
+            Log.d("Text Partition", ( i + 1) + " of " + sizeOfText);
             addToByteArray(memory[i]);
         }
 
+        Log.d("Writing Stack", "Starting Stack Writing");
+        Log.d("Writing Stack", "Starting Stack Size");
         addToByteArray(intToBytes(sizeOfStack));
-        for(int i = memory.length - 1; i > memory.length - sizeOfStack; i--)
+        Log.d("Writing Stack", "Writing Stack");
+        for(int i = memory.length - 1; i >= memory.length - sizeOfStack; i--)
         {
+            Log.d("Stack Partition", i + " of " + (memory.length - sizeOfStack));
             addToByteArray(memory[i]);
         }
+        Log.d("Writing File", "Byte Array Completed");
 
 
     }
