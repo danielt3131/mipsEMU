@@ -74,8 +74,10 @@ public class MipsMachine {
         this.inputFileStream = inputFileStream;
         fileScanner = new Scanner(inputFileStream);
         if (fileScanner.hasNext("State")) {
+            Log.d("inputFileStream Set", "State Header Exists, readState()");
             readState();
         } else {
+            Log.d("inputFileStream Set", "State Header Does Not Exist, readFile()");
             readFile();
         }
     }
@@ -141,35 +143,95 @@ public class MipsMachine {
      */
     public void readState()
     {
+        //Remove header
+        fileScanner.nextLine();
 
-        //reads register
+        byte b1;
+        byte b2;
+        byte b3;
+        byte b4;
+
+        int com;
+
+        //register array
         for(int i = 0; i < 32; i++)
         {
-            register[i] = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+            Log.d("Reading File", "Register: " + i);
+            b1 = fileScanner.nextByte();
+            b2 = fileScanner.nextByte();
+            b3 = fileScanner.nextByte();
+            b4 = fileScanner.nextByte();
+
+            com = combineBytes(b1, b2, b3, b4);
+            register[0] = com;
         }
-        //reads pc, hi, lo
 
-        pc = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
-        hi = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
-        lo = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
+        //pc
+        Log.d("Reading File", "reading PC");
+        b1 = fileScanner.nextByte();
+        b2 = fileScanner.nextByte();
+        b3 = fileScanner.nextByte();
+        b4 = fileScanner.nextByte();
+        com = combineBytes(b1, b2, b3, b4);
+        pc = com;
 
-        //reads amount of memory
-        int memSize = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
-        memory = new byte[memSize];
+        //hi
+        Log.d("Reading File", "reading HI");
+        b1 = fileScanner.nextByte();
+        b2 = fileScanner.nextByte();
+        b3 = fileScanner.nextByte();
+        b4 = fileScanner.nextByte();
+        com = combineBytes(b1, b2, b3, b4);
+        hi = com;
 
-        //sets the stack
-        int stackSize = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
-        for(int i = memSize; i > memSize - stackSize; i--)
+        //lo
+        Log.d("Reading File","reading LO");
+        b1 = fileScanner.nextByte();
+        b2 = fileScanner.nextByte();
+        b3 = fileScanner.nextByte();
+        b4 = fileScanner.nextByte();
+        com = combineBytes(b1, b2, b3, b4);
+        lo = com;
+
+        //Memory
+        Log.d("Reading File", "reading size of memory");
+        b1 = fileScanner.nextByte();
+        b2 = fileScanner.nextByte();
+        b3 = fileScanner.nextByte();
+        b4 = fileScanner.nextByte();
+        com = combineBytes(b1, b2, b3, b4);
+        memory = new byte[com];
+
+        //Text
+        int sizeOfText;
+        Log.d("Reading File", "reading size of text");
+        b1 = fileScanner.nextByte();
+        b2 = fileScanner.nextByte();
+        b3 = fileScanner.nextByte();
+        b4 = fileScanner.nextByte();
+        com = combineBytes(b1, b2, b3, b4);
+        sizeOfText = com;
+
+        for(int i = 0; i < sizeOfText; i++)
         {
             memory[i] = fileScanner.nextByte();
         }
 
-        //sets the text
-        int textSize = combineBytes(fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte(), fileScanner.nextByte());
-        for(int i = 0; i < textSize; i++)
+        //Stack
+        int sizeOfStack;
+        Log.d("Reading File", "reading size of stack");
+        b1 = fileScanner.nextByte();
+        b2 = fileScanner.nextByte();
+        b3 = fileScanner.nextByte();
+        b4 = fileScanner.nextByte();
+        com = combineBytes(b1, b2, b3, b4);
+        sizeOfStack = com;
+
+        for(int i = 0; i < sizeOfStack; i++)
         {
-            memory[i] = fileScanner.nextByte();
+            memory[memory.length - 1 - i] = fileScanner.nextByte();
         }
+
 
     }
 
