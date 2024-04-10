@@ -134,7 +134,6 @@ public class MipsMachine {
 
     private int mstep; //the micro step to run
     private int code; //the instruction word to run
-    private boolean needNext; //determines if nextMicroStep needs to update code
 
     /**
      * has the machine read from the program counter to fetch and execute the next instruction
@@ -228,7 +227,7 @@ public class MipsMachine {
             }
 
             //Subtract
-            else if(grabRightBits(code,6) == 0b1000010)
+            else if(grabRightBits(code,6) == 0b100010)
             {
                 int s = grabRightBits(grabLeftBits(code,11),5); //source 1
                 int t = grabRightBits(grabLeftBits(code,16),5); //source 2
@@ -270,7 +269,6 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
-                    needNext = true;
                     return EOS;
                 }
 
