@@ -375,6 +375,31 @@ public class MipsMachine {
 
 
             }
+            //not
+            else if(grabRightBits(code,6) == 0b100111) {
+                int s = grabRightBits(grabLeftBits(code, 11), 5); //source 1
+                int d = grabRightBits(grabLeftBits(code, 21), 5); //destination
+                int result = ~register[s]; //Compute bitwise NOT from source register
+                if (mstep == 0) {
+                    sendToDisplay(String.format(Locale.US, "Sending %d to ALU for NOT operation", register[s]));
+                    mstep++;
+                    return 0;
+                } else if (mstep == 1) {
+                    sendToDisplay(String.format(Locale.US, "NOT result: %d", result));
+                    mstep++;
+                    return 0;
+                } else if (mstep == 2) {
+                    sendToDisplay(String.format(Locale.US, "PLacing %d in register %s", result, Reference.registerNames[d]));
+                    mstep++;
+                    return 0;
+                } else if (mstep == 3) {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    needNext = true;
+                    return EOS;
+                }
+            }
 
 
 
