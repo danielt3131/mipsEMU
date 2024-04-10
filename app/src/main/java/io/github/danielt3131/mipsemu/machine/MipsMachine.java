@@ -324,6 +324,57 @@ public class MipsMachine {
 
 
             }
+            //XOR
+            else if(grabRightBits(code,6) == 0b100110)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"XOR\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    int result = register[s] ^ register[t];
+                    sendToDisplay(String.format(Locale.US,"XOR result: %d", result));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] ^ register[s], Reference.registerNames[d]));
+                    register[d] = register[s] ^ register[t];
+                    sendIndividualRegisterToDisplay(d);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    needNext = true;
+                    return EOS;
+                }
+
+
+            }
 
 
 
