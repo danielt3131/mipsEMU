@@ -322,6 +322,154 @@ public class MipsMachine {
 
 
             }
+
+            // Multiply
+            else if(grabRightBits(code,6) == 0b011000)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"mul\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] * register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] * register[s], Reference.registerNames[d]));
+                    register[d] = register[s] * register[t];
+                    sendIndividualRegisterToDisplay(d);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    needNext = true;
+                    return EOS;
+                }
+            }
+
+            // Boolean AND
+            else if(grabRightBits(code,6) == 0b100100)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"and\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] & register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] & register[s], Reference.registerNames[d]));
+                    register[d] = register[s] & register[t];
+                    sendIndividualRegisterToDisplay(d);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    needNext = true;
+                    return EOS;
+                }
+            }
+
+            // Boolean OR
+            else if(grabRightBits(code,6) == 0b100101)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"or\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] | register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] | register[s], Reference.registerNames[d]));
+                    register[d] = register[s] | register[t];
+                    sendIndividualRegisterToDisplay(d);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    needNext = true;
+                    return EOS;
+                }
+            }
+
             //XOR
             else if(grabRightBits(code,6) == 0b100110)
             {
@@ -367,7 +515,7 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
-                    needNext = true;
+                    eedNext = true;
                     return EOS;
                 }
 
