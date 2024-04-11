@@ -44,12 +44,13 @@ public class MachineInterface {
         programCounterDisplay.setText("Program Counter: " + programCounter);
     }
 
+
     /**
      * Method to update the instructionDisplay TextView
      * @param instructions The instructions to display
      */
     public void updateInstructionDisplay(String instructions) {
-        instructionDisplay.setText("Instructions: " + instructions);
+        instructionDisplay.setText("Instructions:" + instructions);
     }
 
     /**

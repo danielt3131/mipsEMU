@@ -118,6 +118,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         hexMode.setOnClickListener(hexModeListener);
         binaryMode.setOnClickListener(binaryModeListener);
         memoryDisplay.setMovementMethod(new ScrollingMovementMethod());
+        instructionDisplay.setMovementMethod(new ScrollingMovementMethod());
         runMicroStep.setOnClickListener(runMicroStepListener);
         runOneTime.setOnClickListener(runOneStepListener);
         runContinously.setOnClickListener(runContinuouslyListener);
