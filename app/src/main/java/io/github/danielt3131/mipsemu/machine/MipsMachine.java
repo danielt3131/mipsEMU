@@ -367,7 +367,6 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
-                    needNext = true;
                     return EOS;
                 }
             }
@@ -416,7 +415,6 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
-                    needNext = true;
                     return EOS;
                 }
             }
@@ -465,7 +463,6 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
-                    needNext = true;
                     return EOS;
                 }
             }
@@ -515,7 +512,7 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
-                    eedNext = true;
+                    NeedNext = true;
                     return EOS;
                 }
 
@@ -595,6 +592,128 @@ public class MipsMachine {
                 }
                 else if(mstep == 5)
                 {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    return EOS;
+                }
+            }
+            // Multiplyi
+            else if(grabLeftBits(code, 6) == 0b011100) {
+                int s = grabRightBits(grabLeftBits(code, 11), 5); // source 1
+                int t = grabRightBits(grabLeftBits(code, 16), 5); // source 2
+                int i = grabRightBits(code, 16); // immediate
+
+                if(mstep == 0) {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1) {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", i));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2) {
+                    sendToDisplay("Sending \"mul\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3) {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[s] * i));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4) {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[s] * i, Reference.registerNames[t]));
+                    register[t] = register[s] * i;
+                    sendIndividualRegisterToDisplay(t);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5) {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    return EOS;
+                }
+            }
+
+            // Boolean ANDi
+            else if(grabLeftBits(code, 6) == 0b001100) {
+                int s = grabRightBits(grabLeftBits(code, 11), 5); // source
+                int t = grabRightBits(grabLeftBits(code, 16), 5); // destination
+                int i = grabRightBits(code, 16); // immediate
+
+                if(mstep == 0) {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1) {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", i));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2) {
+                    sendToDisplay("Sending \"and\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3) {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[s] & i));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4) {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[s] & i, Reference.registerNames[t]));
+                    register[t] = register[s] & i;
+                    sendIndividualRegisterToDisplay(t);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5) {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    pc += 4;
+                    return EOS;
+                }
+            }
+
+            // Boolean ORi
+            else if(grabLeftBits(code, 6) == 0b001101) {
+                int s = grabRightBits(grabLeftBits(code, 11), 5); // source
+                int t = grabRightBits(grabLeftBits(code, 16), 5); // destination
+                int i = grabRightBits(code, 16); // immediate
+
+                if(mstep == 0) {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1) {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", i));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2) {
+                    sendToDisplay("Sending \"or\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3) {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[s] | i));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4) {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[s] | i, Reference.registerNames[t]));
+                    register[t] = register[s] | i;
+                    sendIndividualRegisterToDisplay(t);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5) {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
