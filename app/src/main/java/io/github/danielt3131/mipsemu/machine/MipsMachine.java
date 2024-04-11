@@ -367,7 +367,6 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
-                    needNext = true;
                     return EOS;
                 }
 
@@ -394,7 +393,6 @@ public class MipsMachine {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
-                    needNext = true;
                     return EOS;
                 }
             }
