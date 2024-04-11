@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,7 +52,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
     Toolbar machineToolbar;
     Button runOneTime, runMicroStep, runContinously;
-    CheckBox decimalMode, binaryMode, hexMode;
+    RadioButton decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
     TextView[] registerDisplays;
     private final int FILE_OPEN_REQUEST = 4;
@@ -92,7 +93,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         runContinously = findViewById(R.id.runContinouslyButton);
 
         // Set Checkboxes
-        decimalMode = findViewById(R.id.decimialDisplayMode);
+        decimalMode = findViewById(R.id.decimalDisplayMode);
         binaryMode = findViewById(R.id.binaryDisplayMode);
         hexMode = findViewById(R.id.hexDisplayMode);
 
@@ -287,10 +288,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     View.OnClickListener hexModeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Switch the other 2 checkboxes to be off
-            decimalMode.setChecked(false);
-            binaryMode.setChecked(false);
-
             // Tell MipsMachine the memory display option
             mipsMachine.setDisplayFormat(Reference.HEX_MODE);
             mipsMachine.sendMemory();
@@ -301,10 +298,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     View.OnClickListener decimalModeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Switch the other 2 checkboxes to be off
-            hexMode.setChecked(false);
-            binaryMode.setChecked(false);
-
             // Tell MipsMachine the memory display option
             mipsMachine.setDisplayFormat(Reference.DECIMIAL_MODE);
             mipsMachine.sendMemory();
@@ -315,10 +308,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     View.OnClickListener binaryModeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Switch the other 2 checkboxes to be off
-            decimalMode.setChecked(false);
-            hexMode.setChecked(false);
-
             // Tell MipsMachine the memory display option
             mipsMachine.setDisplayFormat(Reference.BINARY_MODE);
             mipsMachine.sendMemory();
