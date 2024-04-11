@@ -53,32 +53,32 @@
             android:layout_width="match_parent"
             android:layout_height="20dp" />
 
-        <LinearLayout
+        <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:orientation="horizontal">
 
-            <CheckBox
-                android:id="@+id/decimialDisplayMode"
-                android:layout_width="142dp"
+            <RadioButton
+                android:id="@+id/decimalDisplayMode"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Decimial" />
+                android:layout_weight="1"
+                android:text="Decimal" />
 
-            <CheckBox
+            <RadioButton
                 android:id="@+id/hexDisplayMode"
-                android:layout_width="137dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Hex" />
 
-            <CheckBox
+            <RadioButton
                 android:id="@+id/binaryDisplayMode"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Binary" />
-
-        </LinearLayout>
+        </RadioGroup>
 
         <Space
             android:layout_width="match_parent"

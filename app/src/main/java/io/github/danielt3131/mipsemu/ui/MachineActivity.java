@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,9 +52,9 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
     Toolbar machineToolbar;
     Button runOneTime, runMicroStep, runContinously;
-    CheckBox decimalMode, binaryMode, hexMode;
+    RadioButton decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
-    TextView[] registerDispalys;
+    TextView[] registerDisplays;
     private final int FILE_OPEN_REQUEST = 4;
     Uri inputFileUri, outputFileUri;
     MipsMachine mipsMachine;
@@ -92,7 +93,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         runContinously = findViewById(R.id.runContinouslyButton);
 
         // Set Checkboxes
-        decimalMode = findViewById(R.id.decimialDisplayMode);
+        decimalMode = findViewById(R.id.decimalDisplayMode);
         binaryMode = findViewById(R.id.binaryDisplayMode);
         hexMode = findViewById(R.id.hexDisplayMode);
 
@@ -100,7 +101,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         setSupportActionBar(machineToolbar);
 
         // Create Machine interface
-        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDispalys, cacheHitRateDisplay);
+        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDisplays, cacheHitRateDisplay);
 
         // Create the machine
         createMipsMachine();
@@ -132,45 +133,45 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
      * Creates register text view array and set each element to its text view
      */
     private void inflateRegisters() {
-        registerDispalys = new TextView[32];    // The number of registers
-        registerDispalys[Reference.REGISTER_ZERO] = findViewById(R.id.register_ZERO);
+        registerDisplays = new TextView[32];    // The number of registers
+        registerDisplays[Reference.REGISTER_ZERO] = findViewById(R.id.register_ZERO);
 
-        registerDispalys[Reference.REGISTER_V0] = findViewById(R.id.register_V0);
-        registerDispalys[Reference.REGISTER_V1] = findViewById(R.id.register_V1);
+        registerDisplays[Reference.REGISTER_V0] = findViewById(R.id.register_V0);
+        registerDisplays[Reference.REGISTER_V1] = findViewById(R.id.register_V1);
 
-        registerDispalys[Reference.REGISTER_T0] = findViewById(R.id.register_T0);
-        registerDispalys[Reference.REGISTER_T1] = findViewById(R.id.register_T1);
-        registerDispalys[Reference.REGISTER_T2] = findViewById(R.id.register_T2);
-        registerDispalys[Reference.REGISTER_T3] = findViewById(R.id.register_T3);
-        registerDispalys[Reference.REGISTER_T4] = findViewById(R.id.register_T4);
-        registerDispalys[Reference.REGISTER_T5] = findViewById(R.id.register_T5);
-        registerDispalys[Reference.REGISTER_T6] = findViewById(R.id.register_T6);
-        registerDispalys[Reference.REGISTER_T7] = findViewById(R.id.register_T7);
-        registerDispalys[Reference.REGISTER_T8] = findViewById(R.id.register_T8);
-        registerDispalys[Reference.REGISTER_T9] = findViewById(R.id.register_T9);
+        registerDisplays[Reference.REGISTER_T0] = findViewById(R.id.register_T0);
+        registerDisplays[Reference.REGISTER_T1] = findViewById(R.id.register_T1);
+        registerDisplays[Reference.REGISTER_T2] = findViewById(R.id.register_T2);
+        registerDisplays[Reference.REGISTER_T3] = findViewById(R.id.register_T3);
+        registerDisplays[Reference.REGISTER_T4] = findViewById(R.id.register_T4);
+        registerDisplays[Reference.REGISTER_T5] = findViewById(R.id.register_T5);
+        registerDisplays[Reference.REGISTER_T6] = findViewById(R.id.register_T6);
+        registerDisplays[Reference.REGISTER_T7] = findViewById(R.id.register_T7);
+        registerDisplays[Reference.REGISTER_T8] = findViewById(R.id.register_T8);
+        registerDisplays[Reference.REGISTER_T9] = findViewById(R.id.register_T9);
 
-        registerDispalys[Reference.REGISTER_A0] = findViewById(R.id.register_A0);
-        registerDispalys[Reference.REGISTER_A1] = findViewById(R.id.register_A1);
-        registerDispalys[Reference.REGISTER_A2] = findViewById(R.id.register_A2);
-        registerDispalys[Reference.REGISTER_A3] = findViewById(R.id.register_A3);
+        registerDisplays[Reference.REGISTER_A0] = findViewById(R.id.register_A0);
+        registerDisplays[Reference.REGISTER_A1] = findViewById(R.id.register_A1);
+        registerDisplays[Reference.REGISTER_A2] = findViewById(R.id.register_A2);
+        registerDisplays[Reference.REGISTER_A3] = findViewById(R.id.register_A3);
 
-        registerDispalys[Reference.REGISTER_K0] = findViewById(R.id.register_K0);
-        registerDispalys[Reference.REGISTER_K1] = findViewById(R.id.register_K1);
+        registerDisplays[Reference.REGISTER_K0] = findViewById(R.id.register_K0);
+        registerDisplays[Reference.REGISTER_K1] = findViewById(R.id.register_K1);
 
-        registerDispalys[Reference.REGISTER_S0] = findViewById(R.id.register_S0);
-        registerDispalys[Reference.REGISTER_S1] = findViewById(R.id.register_S1);
-        registerDispalys[Reference.REGISTER_S2] = findViewById(R.id.register_S2);
-        registerDispalys[Reference.REGISTER_S3] = findViewById(R.id.register_S3);
-        registerDispalys[Reference.REGISTER_S4] = findViewById(R.id.register_S4);
-        registerDispalys[Reference.REGISTER_S5] = findViewById(R.id.register_S5);
-        registerDispalys[Reference.REGISTER_S6] = findViewById(R.id.register_S6);
-        registerDispalys[Reference.REGISTER_S7] = findViewById(R.id.register_S7);
+        registerDisplays[Reference.REGISTER_S0] = findViewById(R.id.register_S0);
+        registerDisplays[Reference.REGISTER_S1] = findViewById(R.id.register_S1);
+        registerDisplays[Reference.REGISTER_S2] = findViewById(R.id.register_S2);
+        registerDisplays[Reference.REGISTER_S3] = findViewById(R.id.register_S3);
+        registerDisplays[Reference.REGISTER_S4] = findViewById(R.id.register_S4);
+        registerDisplays[Reference.REGISTER_S5] = findViewById(R.id.register_S5);
+        registerDisplays[Reference.REGISTER_S6] = findViewById(R.id.register_S6);
+        registerDisplays[Reference.REGISTER_S7] = findViewById(R.id.register_S7);
 
-        registerDispalys[Reference.REGISTER_FP] = findViewById(R.id.register_FP);
-        registerDispalys[Reference.REGISTER_SP] = findViewById(R.id.register_SP);
-        registerDispalys[Reference.REGISTER_GP] = findViewById(R.id.register_GP);
-        registerDispalys[Reference.REGISTER_RA] = findViewById(R.id.register_RA);
-        registerDispalys[Reference.REGISTER_AT] = findViewById(R.id.register_AT);
+        registerDisplays[Reference.REGISTER_FP] = findViewById(R.id.register_FP);
+        registerDisplays[Reference.REGISTER_SP] = findViewById(R.id.register_SP);
+        registerDisplays[Reference.REGISTER_GP] = findViewById(R.id.register_GP);
+        registerDisplays[Reference.REGISTER_RA] = findViewById(R.id.register_RA);
+        registerDisplays[Reference.REGISTER_AT] = findViewById(R.id.register_AT);
 
 
     }
@@ -287,10 +288,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     View.OnClickListener hexModeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Switch the other 2 checkboxes to be off
-            decimalMode.setChecked(false);
-            binaryMode.setChecked(false);
-
             // Tell MipsMachine the memory display option
             mipsMachine.setDisplayFormat(Reference.HEX_MODE);
             mipsMachine.sendMemory();
@@ -301,10 +298,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     View.OnClickListener decimalModeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Switch the other 2 checkboxes to be off
-            hexMode.setChecked(false);
-            binaryMode.setChecked(false);
-
             // Tell MipsMachine the memory display option
             mipsMachine.setDisplayFormat(Reference.DECIMIAL_MODE);
             mipsMachine.sendMemory();
@@ -315,10 +308,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     View.OnClickListener binaryModeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Switch the other 2 checkboxes to be off
-            decimalMode.setChecked(false);
-            hexMode.setChecked(false);
-
             // Tell MipsMachine the memory display option
             mipsMachine.setDisplayFormat(Reference.BINARY_MODE);
             mipsMachine.sendMemory();
