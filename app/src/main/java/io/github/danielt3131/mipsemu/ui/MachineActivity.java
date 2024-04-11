@@ -15,6 +15,7 @@ package io.github.danielt3131.mipsemu.ui;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -73,8 +74,15 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             return insets;
         });
         // Force portrait mode
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        int screenSize = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+        if (screenSize >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            Log.d("Screen", "Large");
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            Log.d("Screen", "Not Large");
+            Log.d("Screen", String.valueOf(screenSize));
+        }
         // Set toolbar
         machineToolbar = findViewById(R.id.materialToolbar);
 
@@ -228,6 +236,8 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Send the blank memory to be displayed
         mipsMachine.sendMemory();
+
+        mipsMachine.sendAllRegistersToDisplay();
 
     }
 

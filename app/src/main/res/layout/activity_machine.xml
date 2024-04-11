@@ -38,7 +38,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="254dp"
+            android:layout_height="144dp"
             android:orientation="horizontal">
 
             <TextView
@@ -139,7 +139,7 @@
         <TextView
             android:id="@+id/instructionDisplay"
             android:layout_width="match_parent"
-            android:layout_height="54dp"
+            android:layout_height="114dp"
             android:text="Instructions" />
 
         <Space
