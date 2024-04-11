@@ -194,6 +194,7 @@ public class MipsMachine {
         {
             running = nextMicroStep() != EOS;
         }
+        microStepInstructions = "";
     }
 
     /**
@@ -267,7 +268,7 @@ public class MipsMachine {
                 {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
-                    pc += 4;
+                    increaseProgramCounter(4);
                     return EOS;
                 }
 
@@ -317,7 +318,7 @@ public class MipsMachine {
                 {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
-                    pc += 4;
+                    increaseProgramCounter(4);
                     needNext = true;
                     return EOS;
                 }
@@ -375,7 +376,7 @@ public class MipsMachine {
                 {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
-                    pc += 4;
+                    increaseProgramCounter(4);
                     return EOS;
                 }
             }
@@ -525,12 +526,13 @@ public class MipsMachine {
         }
        return memoryString;
     }
-
+    String microStepInstructions = "";
     public void sendToDisplay(String message)
     {
         //todo add message to text area of app
         Log.d("Step", message);
-        machineInterface.updateInstructionDisplay(message);
+        microStepInstructions = microStepInstructions + "\n" + message;
+        machineInterface.updateInstructionDisplay(microStepInstructions);
     }
 
     public void saveState(OutputStream outputStream) throws IOException {
@@ -543,6 +545,14 @@ public class MipsMachine {
         StateManager.toFile(outputStream, register, pc, hi, lo, memory);
     }
 
+    /**
+     * Increases the program counter
+     * @param pcValue The value to increase the program counter by
+     */
+    private void increaseProgramCounter(int pcValue) {
+        pc += pcValue;
+        machineInterface.updateProgramCounter(String.valueOf(pc));
+    }
     /**
      * Method to send a individual register to {@link MachineInterface} with the correct format
      * @param registerIndex The register to select from in the register array
