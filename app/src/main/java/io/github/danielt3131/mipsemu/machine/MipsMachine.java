@@ -697,7 +697,7 @@ public class MipsMachine {
      * Getter for the program counter
      * @return The program counter
      */
-    public int getPc() {
+    public int getProgramCounter() {
         return pc;
     }
 
@@ -705,10 +705,9 @@ public class MipsMachine {
      * Setter for the program counter
      * @param pc The program counter
      */
-    public void setPc(int pc) {
+    public void setProgramCounter(int pc) {
         this.pc = pc;
-        machineInterface.updateProgramCounter(String.valueOf(pc));  // Update the program counter on the screen
-
+        sendProgramCounter();   // Send the program counter to the display
     }
 
     /**
@@ -721,7 +720,7 @@ public class MipsMachine {
         } else if (displayFormat == Reference.BINARY_MODE) {
             memoryStr = binaryString();
         } else if (displayFormat == Reference.DECIMIAL_MODE) {
-            memoryStr = Arrays.toString(memory);
+            memoryStr = Arrays.toString(memory).replace("[", "").replace("]", "").replace(",", " ");
         }
         // Pass the memoryStr to update memory
         machineInterface.updateMemoryDisplay(memoryStr);
@@ -767,9 +766,25 @@ public class MipsMachine {
      * @param pcValue The value to increase the program counter by
      */
     private void increaseProgramCounter(int pcValue) {
-        pc += pcValue;
-        machineInterface.updateProgramCounter(String.valueOf(pc));
+        pc += pcValue;  // Increment the program counter by pcValue
+        sendProgramCounter();   // Send the correct format
     }
+
+    /**
+     * Sends the program counter to the display with the correct format
+     * <p>
+     * Used by increaseProgramCounter and setProgramCounter
+     */
+    public void sendProgramCounter() {
+        if (displayFormat == Reference.HEX_MODE) {
+            machineInterface.updateProgramCounter(String.format("%8s", Integer.toHexString(pc)).replace(" ", "0"));
+        } else if (displayFormat == Reference.BINARY_MODE) {
+            machineInterface.updateProgramCounter(String.format("%32s", Integer.toBinaryString(pc)).replace(" ", "0"));
+        } else {
+            machineInterface.updateProgramCounter(String.valueOf(pc));
+        }
+    }
+
     /**
      * Method to send a individual register to {@link MachineInterface} with the correct format
      * @param registerIndex The register to select from in the register array
