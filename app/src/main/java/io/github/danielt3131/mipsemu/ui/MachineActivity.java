@@ -20,11 +20,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,11 +77,10 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         int screenSize = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
         if (screenSize >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            Log.d("Screen", "Large");
+            Log.d("Screen", "Tablet");
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            Log.d("Screen", "Not Large");
-            Log.d("Screen", String.valueOf(screenSize));
+            Log.d("Screen", "Phone");
         }
         // Set toolbar
         machineToolbar = findViewById(R.id.materialToolbar);
@@ -113,6 +112,17 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Create the machine
         createMipsMachine();
+
+        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            memoryDisplay.setTextSize(40);  // Hacky fix for tablets
+        } else {
+            // Screen width
+            float screenWidth = getWindowManager().getCurrentWindowMetrics().getBounds().width();
+            // Calculate memory view font size for phones
+            FontUtils fontUtils = new FontUtils(memoryDisplay.getTextSize(), screenWidth, memoryDisplay.getTypeface());
+            // Convert from px to sp (pixels to scaled pixels)
+            memoryDisplay.setTextSize(TypedValue.deriveDimension(TypedValue.COMPLEX_UNIT_SP, fontUtils.binaryTextSize(), getResources().getDisplayMetrics()));
+        }
 
         // Init the displays
         machineInterface.clearAll();    // Clear the display to display proper register names
@@ -303,6 +313,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             mipsMachine.setDisplayFormat(Reference.HEX_MODE);
             mipsMachine.sendMemory();
             mipsMachine.sendAllRegistersToDisplay();
+            mipsMachine.sendProgramCounter();
         }
     };
 
@@ -313,6 +324,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             mipsMachine.setDisplayFormat(Reference.DECIMIAL_MODE);
             mipsMachine.sendMemory();
             mipsMachine.sendAllRegistersToDisplay();
+            mipsMachine.sendProgramCounter();
         }
     };
 
@@ -323,6 +335,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             mipsMachine.setDisplayFormat(Reference.BINARY_MODE);
             mipsMachine.sendMemory();
             mipsMachine.sendAllRegistersToDisplay();
+            mipsMachine.sendProgramCounter();
         }
     };
 
@@ -334,7 +347,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     @Override
     public void onPositiveClick(DialogFragment dialog, String programCounterValue) {
         try {
-            mipsMachine.setPc(Integer.parseInt(programCounterValue));
+            mipsMachine.setProgramCounter(Integer.parseInt(programCounterValue));
         } catch (NumberFormatException e) {
             Log.e("SetPC", e.getMessage());
         }

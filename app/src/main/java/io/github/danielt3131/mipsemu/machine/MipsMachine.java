@@ -720,7 +720,7 @@ public class MipsMachine {
         } else if (displayFormat == Reference.BINARY_MODE) {
             memoryStr = binaryString();
         } else if (displayFormat == Reference.DECIMIAL_MODE) {
-            memoryStr = Arrays.toString(memory).replace("[", "").replace("]", "").replace(",", " ");
+            memoryStr = Arrays.toString(memory).replace("[", "").replace("]", "").replace(",", "");
         }
         // Pass the memoryStr to update memory
         machineInterface.updateMemoryDisplay(memoryStr);
