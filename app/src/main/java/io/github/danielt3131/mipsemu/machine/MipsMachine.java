@@ -403,7 +403,30 @@ public class MipsMachine {
 
         //I-type instruction
         else
-        {
+        { // for load//
+            if(grabLeftBits(code, 6) == 0b100011)
+            {
+            int t = grabRightBits(grabLeftBits(code,16),5); //destination
+            int b = grabRightBits(grabLeftBits(code, 11), 5);
+            int o = grabRightBits(code, 16);
+            int address = b + o;
+            int value = combineBytes(memory[address], memory[address + 1], memory[address + 2], memory[address + 3]);
+
+            if(mstep == 0)
+            {
+                sendToDisplay(String.format(Locale.US,"Grabbing %d from memory %d", value, address));
+                mstep++;
+                return 0;
+            }
+            else if(mstep == 1)
+            {
+                sendToDisplay(String.format(Locale.US,"Putting %d to register %d", value, t));
+                register[t] = value;
+                mstep = 0;
+                return EOS;
+            }
+
+        }
             //Addi
             if(grabLeftBits(code, 6) == 0b001000)
             {
