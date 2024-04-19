@@ -549,9 +549,64 @@ public class MipsMachine {
 
         //I-type instruction
         else
-        {
+        { // for load//
+            if(grabLeftBits(code, 6) == 0b100011)
+            {
+            int t = grabRightBits(grabLeftBits(code,16),5); //destination
+            int b = grabRightBits(grabLeftBits(code, 11), 5);
+            int o = grabRightBits(code, 16);
+            int address = b + o;
+            int value = combineBytes(memory[address], memory[address + 1], memory[address + 2], memory[address + 3]);
+
+            if(mstep == 0)
+            {
+                sendToDisplay(String.format(Locale.US,"Grabbing %d from memory %d", value, address));
+                mstep++;
+                return 0;
+            }
+            else if(mstep == 1)
+            {
+                sendToDisplay(String.format(Locale.US,"Putting %d to register %d", value, t));
+                register[t] = value;
+                mstep = 0;
+                return EOS;
+            }
+
+
+        }
+            else if(grabLeftBits(code, 6) == 0b101011){
+                int s = grabRightBits(grabLeftBits(code,16),5); //source
+                int b = grabRightBits(grabLeftBits(code, 11), 5);
+                int o = grabRightBits(code, 16);
+                int address = b + o;
+                int value = combineBytes(memory[address], memory[address + 1], memory[address + 2], memory[address + 3]);
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Grabbing %d from memory %d", value, address));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Putting %d to register %d", value, s));
+                    byte p1, p2, p3, p4;
+                    p1 = (byte)grabLeftBits(register[s],8);
+                    p2 = (byte)grabRightBits(grabLeftBits(register[s],16),8);
+                    p3 = (byte)grabLeftBits(grabRightBits(register[s],16),8);
+                    p4 = (byte)grabRightBits(register[s],8);
+
+                    memory[address] = p1;
+                    memory[address + 1] = p2;
+                    memory[address + 2] = p3;
+                    memory[address + 3] = p4;
+
+                    mstep = 0;
+                    return EOS;
+                }
+        }
             //Addi
-            if(grabLeftBits(code, 6) == 0b001000)
+            else if(grabLeftBits(code, 6) == 0b001000)
             {
                 int s = grabRightBits(grabLeftBits(code,11),5); //source
                 int t = grabRightBits(grabLeftBits(code,16),5); //destination
