@@ -15,15 +15,16 @@ package io.github.danielt3131.mipsemu.ui;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,8 +74,14 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             return insets;
         });
         // Force portrait mode
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        int screenSize = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+        if (screenSize >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            Log.d("Screen", "Tablet");
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            Log.d("Screen", "Phone");
+        }
         // Set toolbar
         machineToolbar = findViewById(R.id.materialToolbar);
 
@@ -102,9 +109,24 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Create Machine interface
         machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDisplays, cacheHitRateDisplay);
-
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+        Log.d("Memory", String.valueOf(memoryInfo.availMem));
+        Log.d("Memory", String.valueOf(activityManager.getMemoryClass()));
         // Create the machine
         createMipsMachine();
+
+        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            memoryDisplay.setTextSize(32);  // Hacky fix for tablets
+        } else {
+            // Screen width
+            float screenWidth = getWindowManager().getCurrentWindowMetrics().getBounds().width();
+            // Calculate memory view font size for phones
+            FontUtils fontUtils = new FontUtils(memoryDisplay.getTextSize(), screenWidth, memoryDisplay.getTypeface());
+            // Convert from px to sp (pixels to scaled pixels)
+            memoryDisplay.setTextSize(TypedValue.deriveDimension(TypedValue.COMPLEX_UNIT_SP, fontUtils.binaryTextSize(), getResources().getDisplayMetrics()));
+        }
 
         // Init the displays
         machineInterface.clearAll();    // Clear the display to display proper register names
@@ -118,6 +140,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         hexMode.setOnClickListener(hexModeListener);
         binaryMode.setOnClickListener(binaryModeListener);
         memoryDisplay.setMovementMethod(new ScrollingMovementMethod());
+        instructionDisplay.setMovementMethod(new ScrollingMovementMethod());
         runMicroStep.setOnClickListener(runMicroStepListener);
         runOneTime.setOnClickListener(runOneStepListener);
         runContinously.setOnClickListener(runContinuouslyListener);
@@ -126,7 +149,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     // Create Mips Machine method
 
     private void createMipsMachine() {
-        mipsMachine = new MipsMachine(2000, machineInterface);
+        mipsMachine = new MipsMachine(10000000, machineInterface);
     }
 
     /**
@@ -207,6 +230,10 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         if (item.getItemId() == R.id.saveState) {
             createOutputStream();
         }
+        if (item.getItemId() == R.id.creditsOption) {
+            Intent startCredits = new Intent(MachineActivity.this, CreditsActivity.class);
+            startActivity(startCredits);
+        }
         return false;
     }
 
@@ -227,6 +254,8 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Send the blank memory to be displayed
         mipsMachine.sendMemory();
+
+        mipsMachine.sendAllRegistersToDisplay();
 
     }
 
@@ -292,6 +321,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             mipsMachine.setDisplayFormat(Reference.HEX_MODE);
             mipsMachine.sendMemory();
             mipsMachine.sendAllRegistersToDisplay();
+            mipsMachine.sendProgramCounter();
         }
     };
 
@@ -302,6 +332,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             mipsMachine.setDisplayFormat(Reference.DECIMIAL_MODE);
             mipsMachine.sendMemory();
             mipsMachine.sendAllRegistersToDisplay();
+            mipsMachine.sendProgramCounter();
         }
     };
 
@@ -312,6 +343,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             mipsMachine.setDisplayFormat(Reference.BINARY_MODE);
             mipsMachine.sendMemory();
             mipsMachine.sendAllRegistersToDisplay();
+            mipsMachine.sendProgramCounter();
         }
     };
 
@@ -323,7 +355,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     @Override
     public void onPositiveClick(DialogFragment dialog, String programCounterValue) {
         try {
-            mipsMachine.setPc(Integer.parseInt(programCounterValue));
+            mipsMachine.setProgramCounter(Integer.parseInt(programCounterValue));
         } catch (NumberFormatException e) {
             Log.e("SetPC", e.getMessage());
         }

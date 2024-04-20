@@ -7,11 +7,14 @@
         android:title="Load File" />
     <item
         android:id="@+id/editPC"
-        android:title="Change PC" />
+        android:title="Change Program Counter" />
     <item
         android:id="@+id/machineReset"
         android:title="Reset machine" />
     <item
         android:id="@+id/saveState"
         android:title="Save state" />
+    <item
+        android:id="@+id/creditsOption"
+        android:title="Credits" />
 </menu>

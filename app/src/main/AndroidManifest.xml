@@ -11,7 +11,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MipsEMU"
+        android:largeHeap="true"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.CreditsActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.MachineActivity"
             android:exported="true">

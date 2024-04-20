@@ -127,7 +127,7 @@ public class MipsMachine {
                 Log.d("MipsMachine.readFile Part", part);
                 byte b = (byte)Integer.parseInt(part,2); //Byte.parseByte crashes due to signed bit so this is a workaround
                 memory[tp] = b;
-                machineInterface.updateMemoryDisplay(Arrays.toString(memory));
+                sendMemory();
                 code = code.substring(8);
                 tp++;
                 //System.out.printf("Writing %d at %d%n", b, tp - 1);
@@ -193,6 +193,7 @@ public class MipsMachine {
         {
             running = nextMicroStep() != EOS;
         }
+        microStepInstructions = "";
     }
 
     /**
@@ -209,8 +210,14 @@ public class MipsMachine {
         nextMicroStep();
     }
 
+    /**
+     * Method to run all remaining steps as requested from the user
+     */
     public void runContinuously() {
         // Run continuously
+        // Don't update memory display
+
+
     }
 
     private int nextMicroStep()
@@ -266,7 +273,7 @@ public class MipsMachine {
                 {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
-                    pc += 4;
+                    increaseProgramCounter(4);
                     return EOS;
                 }
 
@@ -316,12 +323,157 @@ public class MipsMachine {
                 {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
-                    pc += 4;
+                    increaseProgramCounter(4);
                     return EOS;
                 }
 
 
             }
+
+            // Multiply
+            else if(grabRightBits(code,6) == 0b011000)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"mul\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] * register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] * register[s], Reference.registerNames[d]));
+                    register[d] = register[s] * register[t];
+                    sendIndividualRegisterToDisplay(d);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    increaseProgramCounter(4);
+                    return EOS;
+                }
+            }
+
+            // Boolean AND
+            else if(grabRightBits(code,6) == 0b100100)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"and\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] & register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] & register[s], Reference.registerNames[d]));
+                    register[d] = register[s] & register[t];
+                    sendIndividualRegisterToDisplay(d);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    increaseProgramCounter(4);
+                    return EOS;
+                }
+            }
+
+            // Boolean OR
+            else if(grabRightBits(code,6) == 0b100101)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); //source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); //source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"or\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 3)
+                {
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[t] | register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] | register[s], Reference.registerNames[d]));
+                    register[d] = register[s] | register[t];
+                    sendIndividualRegisterToDisplay(d);
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    mstep = 0;
+                    increaseProgramCounter(4);
+                    return EOS;
+                }
+            }
+
             //XOR
             else if(grabRightBits(code,6) == 0b100110)
             {
@@ -366,7 +518,7 @@ public class MipsMachine {
                 {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
-                    pc += 4;
+                    increaseProgramCounter(4);
                     return EOS;
                 }
 
@@ -392,7 +544,7 @@ public class MipsMachine {
                 } else if (mstep == 3) {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
-                    pc += 4;
+                    increaseProgramCounter(4);
                     return EOS;
                 }
             }
@@ -403,9 +555,64 @@ public class MipsMachine {
 
         //I-type instruction
         else
-        {
+        { // for load//
+            if(grabLeftBits(code, 6) == 0b100011)
+            {
+            int t = grabRightBits(grabLeftBits(code,16),5); //destination
+            int b = grabRightBits(grabLeftBits(code, 11), 5);
+            int o = grabRightBits(code, 16);
+            int address = b + o;
+            int value = combineBytes(memory[address], memory[address + 1], memory[address + 2], memory[address + 3]);
+
+            if(mstep == 0)
+            {
+                sendToDisplay(String.format(Locale.US,"Grabbing %d from memory %d", value, address));
+                mstep++;
+                return 0;
+            }
+            else if(mstep == 1)
+            {
+                sendToDisplay(String.format(Locale.US,"Putting %d to register %s", value, Reference.registerNames[t]));
+                register[t] = value;
+                mstep = 0;
+                return EOS;
+            }
+
+
+        }
+            else if(grabLeftBits(code, 6) == 0b101011){
+                int s = grabRightBits(grabLeftBits(code,16),5); //source
+                int b = grabRightBits(grabLeftBits(code, 11), 5);
+                int o = grabRightBits(code, 16);
+                int address = b + o;
+                int value = combineBytes(memory[address], memory[address + 1], memory[address + 2], memory[address + 3]);
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Grabbing %d from memory %d", value, address));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Putting %d to register %s", value, Reference.registerNames[s]));
+                    byte p1, p2, p3, p4;
+                    p1 = (byte)grabLeftBits(register[s],8);
+                    p2 = (byte)grabRightBits(grabLeftBits(register[s],16),8);
+                    p3 = (byte)grabLeftBits(grabRightBits(register[s],16),8);
+                    p4 = (byte)grabRightBits(register[s],8);
+
+                    memory[address] = p1;
+                    memory[address + 1] = p2;
+                    memory[address + 2] = p3;
+                    memory[address + 3] = p4;
+
+                    mstep = 0;
+                    return EOS;
+                }
+        }
             //Addi
-            if(grabLeftBits(code, 6) == 0b001000)
+            else if(grabLeftBits(code, 6) == 0b001000)
             {
                 int s = grabRightBits(grabLeftBits(code,11),5); //source
                 int t = grabRightBits(grabLeftBits(code,16),5); //destination
@@ -447,7 +654,7 @@ public class MipsMachine {
                 {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
-                    pc += 4;
+                    increaseProgramCounter(4);
                     return EOS;
                 }
             }
@@ -551,7 +758,7 @@ public class MipsMachine {
      * Getter for the program counter
      * @return The program counter
      */
-    public int getPc() {
+    public int getProgramCounter() {
         return pc;
     }
 
@@ -559,10 +766,9 @@ public class MipsMachine {
      * Setter for the program counter
      * @param pc The program counter
      */
-    public void setPc(int pc) {
+    public void setProgramCounter(int pc) {
         this.pc = pc;
-        machineInterface.updateProgramCounter(String.valueOf(pc));  // Update the program counter on the screen
-
+        sendProgramCounter();   // Send the program counter to the display
     }
 
     /**
@@ -570,13 +776,13 @@ public class MipsMachine {
      */
     public void sendMemory() {
         String memoryStr = "";
-        if (displayFormat == Reference.HEX_MODE) {
+        /*if (displayFormat == Reference.HEX_MODE) {
             memoryStr = HexFormat.ofDelimiter(" ").formatHex(memory);
         } else if (displayFormat == Reference.BINARY_MODE) {
             memoryStr = binaryString();
         } else if (displayFormat == Reference.DECIMIAL_MODE) {
-            memoryStr = Arrays.toString(memory);
-        }
+            memoryStr = Arrays.toString(memory).replace("[", "").replace("]", "").replace(",", "");
+        }*/
         // Pass the memoryStr to update memory
         machineInterface.updateMemoryDisplay(memoryStr);
     }
@@ -597,12 +803,13 @@ public class MipsMachine {
         }
        return memoryString;
     }
-
+    String microStepInstructions = "";
     public void sendToDisplay(String message)
     {
         //todo add message to text area of app
         Log.d("Step", message);
-        machineInterface.updateInstructionDisplay(message);
+        microStepInstructions = microStepInstructions + "\n" + message;
+        machineInterface.updateInstructionDisplay(microStepInstructions);
     }
 
     public void saveState(OutputStream outputStream) throws IOException {
@@ -613,6 +820,30 @@ public class MipsMachine {
         // Save the save
         Log.d("saveState", "Starting to save the state");
         StateManager.toFile(outputStream, register, pc, hi, lo, memory);
+    }
+
+    /**
+     * Increases the program counter
+     * @param pcValue The value to increase the program counter by
+     */
+    private void increaseProgramCounter(int pcValue) {
+        pc += pcValue;  // Increment the program counter by pcValue
+        sendProgramCounter();   // Send the correct format
+    }
+
+    /**
+     * Sends the program counter to the display with the correct format
+     * <p>
+     * Used by increaseProgramCounter and setProgramCounter
+     */
+    public void sendProgramCounter() {
+        if (displayFormat == Reference.HEX_MODE) {
+            machineInterface.updateProgramCounter(String.format("%8s", Integer.toHexString(pc)).replace(" ", "0"));
+        } else if (displayFormat == Reference.BINARY_MODE) {
+            machineInterface.updateProgramCounter(String.format("%32s", Integer.toBinaryString(pc)).replace(" ", "0"));
+        } else {
+            machineInterface.updateProgramCounter(String.valueOf(pc));
+        }
     }
 
     /**
