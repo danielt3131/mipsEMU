@@ -127,7 +127,7 @@ public class MipsMachine {
                 Log.d("MipsMachine.readFile Part", part);
                 byte b = (byte)Integer.parseInt(part,2); //Byte.parseByte crashes due to signed bit so this is a workaround
                 memory[tp] = b;
-                machineInterface.updateMemoryDisplay(Arrays.toString(memory));
+                sendMemory();
                 code = code.substring(8);
                 tp++;
                 //System.out.printf("Writing %d at %d%n", b, tp - 1);
@@ -210,8 +210,14 @@ public class MipsMachine {
         nextMicroStep();
     }
 
+    /**
+     * Method to run all remaining steps as requested from the user
+     */
     public void runContinuously() {
         // Run continuously
+        // Don't update memory display
+
+
     }
 
     private int nextMicroStep()
@@ -566,7 +572,7 @@ public class MipsMachine {
             }
             else if(mstep == 1)
             {
-                sendToDisplay(String.format(Locale.US,"Putting %d to register %d", value, t));
+                sendToDisplay(String.format(Locale.US,"Putting %d to register %s", value, Reference.registerNames[t]));
                 register[t] = value;
                 mstep = 0;
                 return EOS;
@@ -589,7 +595,7 @@ public class MipsMachine {
                 }
                 else if(mstep == 1)
                 {
-                    sendToDisplay(String.format(Locale.US,"Putting %d to register %d", value, s));
+                    sendToDisplay(String.format(Locale.US,"Putting %d to register %s", value, Reference.registerNames[s]));
                     byte p1, p2, p3, p4;
                     p1 = (byte)grabLeftBits(register[s],8);
                     p2 = (byte)grabRightBits(grabLeftBits(register[s],16),8);
