@@ -436,7 +436,29 @@ public class MipsMachine {
                     return EOS;
                 }
             }
+            else if(grabRightBits(code,6) == 0b010000){
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
 
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d to register %s", hi,Reference.registerNames[d]));
+                    register[d] = hi;
+                    mstep = 0;
+                    return EOS;
+                }
+            }
+
+            else if(grabRightBits(code,6) == 0b010010){
+                int d = grabRightBits(grabLeftBits(code,21),5); //destination
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d to register %s", lo,Reference.registerNames[d]));
+                    register[d] = lo;
+                    mstep = 0;
+                    return EOS;
+                }
+            }
             // Boolean OR
             else if(grabRightBits(code,6) == 0b100101)
             {
