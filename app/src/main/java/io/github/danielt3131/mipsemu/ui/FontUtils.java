@@ -27,7 +27,7 @@ public class FontUtils {
     private float textSizePx;
     private final float memoryViewWidth;
     private Paint paint;
-    private static final String binaryTestString = "0xFFFF: 11111111 11111111 11111111 11111111";
+    private static final String binaryTestString = "0xFFFFFF: 11111111 11111111 11111111 11111111";
     public FontUtils(float textSizePx, float memoryViewWidth, Typeface typeface) {
         this.textSizePx = textSizePx;
         this.memoryViewWidth = memoryViewWidth;

@@ -51,7 +51,7 @@ public class MachineInterface {
         int memoryAddress = 0;
         int i = 0;
         while (i < memoryArray.length / 4) {
-            String memoryAddressString =  String.format("0x%4s", Integer.toHexString(memoryAddress)).replace(" ", "0");
+            String memoryAddressString =  String.format("0x%6s", Integer.toHexString(memoryAddress)).replace(" ", "0");
             memoryString = memoryString + String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]);
             memoryAddress += 4;
         }

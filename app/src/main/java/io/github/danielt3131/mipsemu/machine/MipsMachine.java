@@ -776,13 +776,13 @@ public class MipsMachine {
      */
     public void sendMemory() {
         String memoryStr = "";
-        if (displayFormat == Reference.HEX_MODE) {
+        /*if (displayFormat == Reference.HEX_MODE) {
             memoryStr = HexFormat.ofDelimiter(" ").formatHex(memory);
         } else if (displayFormat == Reference.BINARY_MODE) {
             memoryStr = binaryString();
         } else if (displayFormat == Reference.DECIMIAL_MODE) {
             memoryStr = Arrays.toString(memory).replace("[", "").replace("]", "").replace(",", "");
-        }
+        }*/
         // Pass the memoryStr to update memory
         machineInterface.updateMemoryDisplay(memoryStr);
     }

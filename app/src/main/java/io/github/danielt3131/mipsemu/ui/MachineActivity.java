@@ -109,12 +109,16 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Create Machine interface
         machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDisplays, cacheHitRateDisplay);
-
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+        Log.d("Memory", String.valueOf(memoryInfo.availMem));
+        Log.d("Memory", String.valueOf(activityManager.getMemoryClass()));
         // Create the machine
         createMipsMachine();
 
         if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-            memoryDisplay.setTextSize(40);  // Hacky fix for tablets
+            memoryDisplay.setTextSize(32);  // Hacky fix for tablets
         } else {
             // Screen width
             float screenWidth = getWindowManager().getCurrentWindowMetrics().getBounds().width();
@@ -145,7 +149,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     // Create Mips Machine method
 
     private void createMipsMachine() {
-        mipsMachine = new MipsMachine(2000, machineInterface);
+        mipsMachine = new MipsMachine(10000000, machineInterface);
     }
 
     /**
