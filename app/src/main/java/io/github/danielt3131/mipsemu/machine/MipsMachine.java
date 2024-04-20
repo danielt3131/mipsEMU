@@ -443,6 +443,13 @@ public class MipsMachine {
                 {
                     sendToDisplay(String.format(Locale.US,"Placing %d to register %s", hi,Reference.registerNames[d]));
                     register[d] = hi;
+                    mstep++;
+                    return 0;
+                }
+                if(mstep == 1)
+                {
+                    sendToDisplay("Increasing program counter counter by 4");
+                    increaseProgramCounter(4);
                     mstep = 0;
                     return EOS;
                 }
@@ -455,6 +462,13 @@ public class MipsMachine {
                 {
                     sendToDisplay(String.format(Locale.US,"Placing %d to register %s", lo,Reference.registerNames[d]));
                     register[d] = lo;
+                    mstep++;
+                    return 0;
+                }
+                if(mstep == 1)
+                {
+                    sendToDisplay("Increasing program counter counter by 4");
+                    increaseProgramCounter(4);
                     mstep = 0;
                     return EOS;
                 }
