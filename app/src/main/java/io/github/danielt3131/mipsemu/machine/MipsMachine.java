@@ -328,7 +328,6 @@ public class MipsMachine {
             {
                 int s = grabRightBits(grabLeftBits(code,11),5); //source 1
                 int t = grabRightBits(grabLeftBits(code,16),5); //source 2
-                int d = grabRightBits(grabLeftBits(code,21),5); //destination
 
                 if(mstep == 0)
                 {
@@ -356,13 +355,25 @@ public class MipsMachine {
                 }
                 else if(mstep == 4)
                 {
-                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[t] * register[s], Reference.registerNames[d]));
-                    register[d] = register[s] * register[t];
-                    sendIndividualRegisterToDisplay(d);
+                    int val1 = register[s];
+                    int val2 = register[t];
+                    long results = (long) val1 * val2;
+                    hi = (int) (results / Math.pow(2,32));
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register hi", hi));
                     mstep++;
                     return 0;
                 }
                 else if(mstep == 5)
+                {
+                    int val1 = register[s];
+                    int val2 = register[t];
+                    long results = (long) val1 * val2;
+                    lo = (int) (results % Math.pow(2,32));
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register lo", lo));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 6)
                 {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
@@ -592,46 +603,6 @@ public class MipsMachine {
                 }
                 else if(mstep == 5)
                 {
-                    sendToDisplay("Increasing PC by 4");
-                    mstep = 0;
-                    pc += 4;
-                    return EOS;
-                }
-            }
-            // Multiplyi
-            else if(grabLeftBits(code, 6) == 0b011100) {
-                int s = grabRightBits(grabLeftBits(code, 11), 5); // source 1
-                int t = grabRightBits(grabLeftBits(code, 16), 5); // source 2
-                int i = grabRightBits(code, 16); // immediate
-
-                if(mstep == 0) {
-                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
-                    mstep++;
-                    return 0;
-                }
-                else if(mstep == 1) {
-                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU", i));
-                    mstep++;
-                    return 0;
-                }
-                else if(mstep == 2) {
-                    sendToDisplay("Sending \"mul\" to ALU");
-                    mstep++;
-                    return 0;
-                }
-                else if(mstep == 3) {
-                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", register[s] * i));
-                    mstep++;
-                    return 0;
-                }
-                else if(mstep == 4) {
-                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", register[s] * i, Reference.registerNames[t]));
-                    register[t] = register[s] * i;
-                    sendIndividualRegisterToDisplay(t);
-                    mstep++;
-                    return 0;
-                }
-                else if(mstep == 5) {
                     sendToDisplay("Increasing PC by 4");
                     mstep = 0;
                     pc += 4;
