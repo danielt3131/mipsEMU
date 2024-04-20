@@ -13,6 +13,7 @@
  */
 package io.github.danielt3131.mipsemu.ui;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
