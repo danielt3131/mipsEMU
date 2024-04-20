@@ -1,3 +1,16 @@
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 or later.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package io.github.danielt3131.mipsemu;
 
 import android.app.Activity;
@@ -33,7 +46,17 @@ public class MachineInterface {
      * @param memory The memory formatted
      */
     public void updateMemoryDisplay(String memory) {
-        memoryDisplay.setText("Memory\n" + memory);
+        String[] memoryArray = memory.split(" ");
+        String memoryString = "";
+        int memoryAddress = 0;
+        int i = 0;
+        while (i < memoryArray.length / 4) {
+            String memoryAddressString =  String.format("0x%6s", Integer.toHexString(memoryAddress)).replace(" ", "0");
+            memoryString = memoryString + String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]);
+            memoryAddress += 4;
+        }
+        memoryDisplay.setText("Memory\n" + memoryString);
+        //memoryDisplay.setText("Memory\n" + memory);
     }
 
     /**
@@ -44,12 +67,13 @@ public class MachineInterface {
         programCounterDisplay.setText("Program Counter: " + programCounter);
     }
 
+
     /**
      * Method to update the instructionDisplay TextView
      * @param instructions The instructions to display
      */
     public void updateInstructionDisplay(String instructions) {
-        instructionDisplay.setText("Instructions: " + instructions);
+        instructionDisplay.setText("Instructions:" + instructions);
     }
 
     /**
