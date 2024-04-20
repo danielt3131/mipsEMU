@@ -13,6 +13,9 @@
         android:theme="@style/Theme.MipsEMU"
         tools:targetApi="31">
         <activity
+            android:name=".ui.CreditsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.MachineActivity"
             android:exported="true">
             <intent-filter>

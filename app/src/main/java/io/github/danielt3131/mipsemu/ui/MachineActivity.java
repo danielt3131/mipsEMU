@@ -226,6 +226,10 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         if (item.getItemId() == R.id.saveState) {
             createOutputStream();
         }
+        if (item.getItemId() == R.id.creditsOption) {
+            Intent startCredits = new Intent(MachineActivity.this, CreditsActivity.class);
+            startActivity(startCredits);
+        }
         return false;
     }
 
