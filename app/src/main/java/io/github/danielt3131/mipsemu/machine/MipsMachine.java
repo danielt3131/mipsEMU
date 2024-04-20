@@ -757,6 +757,16 @@ public class MipsMachine {
 
     }
 
+    byte getFromMemory(int address)
+    {
+        return memory[address];
+    }
+
+    void sendToMemory(int address, byte data)
+    {
+        memory[address] = data;
+    }
+
 
     //HELPER METHODS
 
