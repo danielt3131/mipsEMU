@@ -109,7 +109,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         setSupportActionBar(machineToolbar);
 
         // Create Machine interface
-        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDisplays, cacheHitRateDisplay);
+        machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDisplays, cacheHitRateDisplay, this);
         ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
         activityManager.getMemoryInfo(memoryInfo);
@@ -130,7 +130,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         }
 
         // Init the displays
-        machineInterface.clearAll();    // Clear the display to display proper register names
+        //machineInterface.clearAll();    // Clear the display to display proper register names
         hexMode.setChecked(true);   // Set the default memory display mode to be hex
         mipsMachine.setDisplayFormat(Reference.HEX_MODE);
         mipsMachine.sendMemory();   // Show blank memory to display
@@ -150,7 +150,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     // Create Mips Machine method
 
     private void createMipsMachine() {
-        mipsMachine = new MipsMachine(10000000, machineInterface);
+        mipsMachine = new MipsMachine(100000, machineInterface);
     }
 
     /**
@@ -345,6 +345,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             mipsMachine.sendMemory();
             mipsMachine.sendAllRegistersToDisplay();
             mipsMachine.sendProgramCounter();
+            Toast.makeText(MachineActivity.this, "Now Processing\nThis will take a while", Toast.LENGTH_SHORT).show();
         }
     };
 
