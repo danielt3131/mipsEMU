@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import io.github.danielt3131.mipsemu.R;
+
 public class StateManager
 {
 
@@ -33,20 +35,27 @@ public class StateManager
     ...
      */
     public static void toFile(OutputStream outputStream, int[] register, int pc, int hi, int lo, byte[] memory) {
-        Log.d("StateManager", "Saving state");
-        try {
-            createByteArray(register, pc, hi, lo, memory);
-            byte[] b = new byte[byteArrayList.size()];
-            for (int i = 0; i < b.length; i++) {
-                b[i] = byteArrayList.get(i);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("StateManager", "Saving state");
+                try {
+                    createByteArray(register, pc, hi, lo, memory);
+                    byte[] b = new byte[byteArrayList.size()];
+                    for (int i = 0; i < b.length; i++) {
+                        b[i] = byteArrayList.get(i);
+                    }
+                    outputStream.write(b, 6, b.length);
+                    outputStream.flush();
+                    outputStream.close();
+                } catch (IOException e) {
+                    Log.e("StateManager", e.getMessage());
+                }
             }
-            outputStream.write(b, 6, b.length);
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException e) {
-            Log.e("StateManager", e.getMessage());
-        }
+        });
+        thread.start();
     }
+
 
     private static byte[] intToBytes(int i)
     {
