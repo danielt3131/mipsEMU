@@ -14,11 +14,13 @@
 package io.github.danielt3131.mipsemu;
 
 import android.app.Activity;
-import android.content.Context;
-import android.os.Handler;
+import android.text.PrecomputedText;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.text.PrecomputedTextCompat;
+import androidx.core.widget.TextViewCompat;
 
 /**
  * Class used for communication from {@link io.github.danielt3131.mipsemu.machine.MipsMachine} to {@link io.github.danielt3131.mipsemu.ui.MachineActivity}
@@ -27,6 +29,7 @@ public class MachineInterface {
     private TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
     private TextView[] registers;
     private Activity activity;
+    private PrecomputedText preComputedMemoryDisplay;
 
     /**
      *
@@ -55,7 +58,6 @@ public class MachineInterface {
             @Override
             public void run() {
                 String[] memoryArray = memory.split(" ");
-                String memoryString = "";
                 int memoryAddress = 0;
                 boolean isBinary = false;
                 if (memoryArray[0].length() == 8) {
@@ -63,14 +65,23 @@ public class MachineInterface {
                 }
                 Log.d("Memory", "Now adding addresses");
                 int i = 0;
+                //memoryDisplay.append("Memory\n");
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("Memory\n");
                 while (i < memoryArray.length / 4) {
-                    String memoryAddressString =  String.format("0x%6s", Integer.toHexString(memoryAddress).toUpperCase()).replace(" ", "0");
-                    memoryString = memoryString + String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]);
+                    String memoryAddressString =  String.format("0x%6s", Integer.toHexString(memoryAddress)).replace(" ", "0");
+                    //memoryDisplay.append(String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]));
+                    stringBuilder.append(String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]));
                     memoryAddress += 4;
                 }
-                finalMemoryString[0] = memoryString;
+                finalMemoryString[0] = stringBuilder.toString();
+                Log.d("Memory", "Computing display");
+                preComputedMemoryDisplay = PrecomputedText.create(finalMemoryString[0], memoryDisplay.getTextMetricsParams());
                 Log.d("Memory", "Sent to UI");
-                activity.runOnUiThread(() -> memoryDisplay.setText("Memory\n" + finalMemoryString[0]));
+                memoryDisplay.post(() -> {
+                    memoryDisplay.setText(preComputedMemoryDisplay);
+                });
+                //activity.runOnUiThread(() -> memoryDisplay.setText(preComputedMemoryDisplay));
                 if (isBinary) {
                     activity.runOnUiThread(() -> Toast.makeText(activity, "Now showing binary\nTold you it will take time!", Toast.LENGTH_SHORT).show());
                 }

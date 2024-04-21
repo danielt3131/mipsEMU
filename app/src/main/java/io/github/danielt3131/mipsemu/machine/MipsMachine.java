@@ -127,13 +127,14 @@ public class MipsMachine {
                 Log.d("MipsMachine.readFile Part", part);
                 byte b = (byte)Integer.parseInt(part,2); //Byte.parseByte crashes due to signed bit so this is a workaround
                 memory[tp] = b;
-                sendMemory();
+                //sendMemory();
                 code = code.substring(8);
                 tp++;
                 //System.out.printf("Writing %d at %d%n", b, tp - 1);
             }
 
         }
+        sendMemory();
     }
 
     /**
@@ -804,13 +805,14 @@ public class MipsMachine {
     private String binaryString() {
         byte[] indivByte = new byte[1];
         String memoryString = "";
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < memory.length; i++) {
             indivByte[0] = memory[i];
             BigInteger getBinary = new BigInteger(indivByte);
             // Add leading zeros and space -> 00101010 01110001 versus 1010101110001
-            memoryString = memoryString + String.format("%8s", getBinary.toString(2)).replace(" ", "0") + " ";
+            stringBuilder.append(String.format("%8s", getBinary.toString(2)).replace(" ", "0")).append(" ");
         }
-        return memoryString;
+        return stringBuilder.toString();
     }
 
 //    private String binaryString() {
