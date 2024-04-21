@@ -266,6 +266,7 @@ public class MipsMachine {
      */
     public void runNextStep() {
         nextStep();
+        sendAllRegistersToDisplay();
     }
 
     /**
@@ -273,6 +274,7 @@ public class MipsMachine {
      */
     public void runNextMicroStep() {
         nextMicroStep();
+        sendAllRegistersToDisplay();
     }
 
     /**
@@ -284,6 +286,8 @@ public class MipsMachine {
         while (code != 0) {
             nextStep();
         }
+        sendAllRegistersToDisplay();
+        sendMemory();
     }
 
     private int nextMicroStep() {
