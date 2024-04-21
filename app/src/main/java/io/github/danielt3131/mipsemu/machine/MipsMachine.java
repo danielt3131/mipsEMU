@@ -761,17 +761,68 @@ public class MipsMachine {
     CacheBlock[] l2 = new CacheBlock[16];
     CacheBlock[] l3 = new CacheBlock[32];
 
+    int hits = 0;
+    int attempts = 0;
 
     byte getFromMemory(int address)
     {
+        attempts++;
+        hits++;
+
+        int index = address % 8;
+
+        int tag = address/8;
+
+        if (l1[index].isValid() && l1[index].tag == tag) {
+            return l1[index].data;
+        }
+
+        index = address % 16;
+
+        tag = address/16;
+
+        if (l2[index].isValid() && l2[index].tag == tag) {
+            return l2[index].data;
+        }
+
+        index = address % 32;
+
+        tag = address/32;
+
+        if (l3[index].isValid() && l3[index].tag == tag) {
+            return l3[index].data;
+        }
+
+        hits--;
+
         return memory[address];
     }
 
     void sendToMemory(int address, byte data)
     {
+        int index = address % 8;
+
+        l1[index].tag = address/8;
+        l1[index].data = data;
+
+        l1[index].setValid();
+
+        index = address % 16;
+
+        l2[index].tag = address/16;
+        l2[index].data = data;
+
+        l2[index].setValid();
+
+        index = address % 32;
+
+        l3[index].tag = address/32;
+        l3[index].data = data;
+
+        l3[index].setValid();
+
         memory[address] = data;
     }
-
 
     //HELPER METHODS
 
