@@ -150,7 +150,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     // Create Mips Machine method
 
     private void createMipsMachine() {
-        mipsMachine = new MipsMachine(100000, machineInterface);
+        mipsMachine = new MipsMachine(1000*100*5, machineInterface);
     }
 
     /**
