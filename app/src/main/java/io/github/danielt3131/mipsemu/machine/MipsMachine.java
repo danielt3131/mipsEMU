@@ -926,6 +926,12 @@ public class MipsMachine {
                 int t = grabRightBits(grabLeftBits(code,16),5); //destination
                 int i = grabRightBits(code,16); //immediate
 
+                if(i >> 15 == 1)
+                {
+                    int mask = 0b11111111111111110000000000000000;
+                    i += mask;
+                }
+
                 if(mstep == 0)
                 {
                     sendToDisplay(String.format(Locale.US,"Sending %d to ALU", register[s]));
