@@ -757,6 +757,8 @@ public class MipsMachine {
 
     }
 
+
+
     byte getFromMemory(int address)
     {
         return memory[address];
