@@ -45,8 +45,12 @@ public class MipsMachine {
     //Machine memory
     private byte[] memory;
 
-    //labels
-    private ArrayList<Label> labels;
+    CacheBlock[] l1 = new CacheBlock[8];
+    CacheBlock[] l2 = new CacheBlock[16];
+    CacheBlock[] l3 = new CacheBlock[32];
+
+    int hits = 0;
+    int attempts = 0;
 
     private MachineInterface machineInterface;
     private InputStream inputFileStream;
@@ -175,7 +179,7 @@ public class MipsMachine {
 
     private int getCode()
     {
-        return combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
+        return combineBytes(getFromMemory(pc), getFromMemory(pc+1), getFromMemory(pc+2), getFromMemory(pc+3));
     }
 
     private int mstep; //the micro step to run
@@ -757,12 +761,21 @@ public class MipsMachine {
 
     }
 
-    CacheBlock[] l1 = new CacheBlock[8];
-    CacheBlock[] l2 = new CacheBlock[16];
-    CacheBlock[] l3 = new CacheBlock[32];
 
-    int hits = 0;
-    int attempts = 0;
+
+    public double hitRate()
+    {
+        if(attempts == 0)
+        {
+            return 0;
+        }
+        return (double) hits / attempts;
+    }
+
+    public double missRate()
+    {
+        return 1 - hitRate();
+    }
 
     byte getFromMemory(int address)
     {
