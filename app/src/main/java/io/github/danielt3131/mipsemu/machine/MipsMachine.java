@@ -865,7 +865,7 @@ public class MipsMachine {
                 int s = grabRightBits(grabLeftBits(code,11),5);
 
                 //Checking two bits compliment
-                if(offset >> 15 == 1)
+                if(offset >> 17 == 1)
                 {
                     //make negative
                     int mask = 0b11111111111111000000000000000000;
