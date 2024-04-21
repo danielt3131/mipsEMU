@@ -245,7 +245,8 @@ public class MipsMachine {
 
     private int getCode()
     {
-        return combineBytes(getFromMemory(pc), getFromMemory(pc+1), getFromMemory(pc+2), getFromMemory(pc+3));
+        return combineBytes(memory[pc], memory[pc+1], memory[pc+2], memory[pc+3]);
+        //return combineBytes(getFromMemory(pc), getFromMemory(pc+1), getFromMemory(pc+2), getFromMemory(pc+3));
     }
 
     private int mstep; //the micro step to run
