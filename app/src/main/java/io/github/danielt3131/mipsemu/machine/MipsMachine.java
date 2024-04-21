@@ -227,6 +227,8 @@ public class MipsMachine {
     {
         Log.d("mstep", "MSTEP: " + mstep);
 
+        code = getCode();
+
         if(code == 0) return EOS;
 
         //R-type instruction
@@ -563,8 +565,64 @@ public class MipsMachine {
                 }
             }
 
+            ///set less than
 
+            else if(grabRightBits(code,6) == 0b101010)
+            {
+                int s = grabRightBits(grabLeftBits(code,11),5); // source 1
+                int t = grabRightBits(grabLeftBits(code,16),5); // source 2
+                int d = grabRightBits(grabLeftBits(code,21),5); // destination
 
+                if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US, "Sending %d to ALU", register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if (mstep == 2)
+                {
+                    sendToDisplay(String.format(Locale.US, "Sending %d to ALU", register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if (mstep == 3)
+                {
+                    sendToDisplay("Sending \"<\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if (mstep == 4)
+                {
+                    int val = 0;
+                    if(register[s] < register[t])
+                    {
+                        val = 1;
+                    }
+                    sendToDisplay(String.format(Locale.US,"Retrieved %d from ALU", val ));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    int val = 0;
+                    if(register[s] < register[t])
+                    {
+                        val = 1;
+                    }
+                    register[d] = val;
+                    sendToDisplay(String.format(Locale.US, "PLacing %d in register %s", val, Reference.registerNames[d]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 6)
+                {
+                    sendToDisplay("Increasing PC by 4");
+                    increaseProgramCounter(4);
+                    mstep = 0;
+                    return EOS;
+                }
+
+            }
         }
 
         //I-type instruction
