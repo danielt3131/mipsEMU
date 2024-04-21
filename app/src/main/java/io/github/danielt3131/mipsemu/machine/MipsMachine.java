@@ -620,8 +620,7 @@ public class MipsMachine {
                     mstep = 0;
                     return EOS;
                 }
-
-
+                // Store
             } else if (grabLeftBits(code, 6) == 0b101011) {
                 int s = grabRightBits(grabLeftBits(code, 16), 5); //source
                 int b = grabRightBits(grabLeftBits(code, 11), 5);
@@ -649,6 +648,7 @@ public class MipsMachine {
                     mstep = 0;
                     return EOS;
                 }
+                sendMemory();   // Update the memory display -> will take time
             }
             //Jump
             else if (grabLeftBits(code, 6) == 0b000010) {
