@@ -48,8 +48,12 @@ public class MipsMachine {
     //Machine memory
     private byte[] memory;
 
-    //labels
-    private ArrayList<Label> labels;
+    CacheBlock[] l1 = new CacheBlock[8];
+    CacheBlock[] l2 = new CacheBlock[16];
+    CacheBlock[] l3 = new CacheBlock[32];
+
+    int hits = 0;
+    int attempts = 0;
 
     private MachineInterface machineInterface;
     private InputStream inputFileStream;
@@ -239,8 +243,9 @@ public class MipsMachine {
 
     }
 
-    private int getCode() {
-        return combineBytes(memory[pc], memory[pc + 1], memory[pc + 2], memory[pc + 3]);
+    private int getCode()
+    {
+        return combineBytes(getFromMemory(pc), getFromMemory(pc+1), getFromMemory(pc+2), getFromMemory(pc+3));
     }
 
     private int mstep; //the micro step to run
@@ -267,6 +272,7 @@ public class MipsMachine {
     public void runNextStep() {
         nextStep();
         sendAllRegistersToDisplay();
+        machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
     }
 
     /**
@@ -275,6 +281,7 @@ public class MipsMachine {
     public void runNextMicroStep() {
         nextMicroStep();
         sendAllRegistersToDisplay();
+        machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
     }
 
     /**
@@ -288,6 +295,7 @@ public class MipsMachine {
         }
         sendAllRegistersToDisplay();
         sendMemory();
+        machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
     }
 
     private int nextMicroStep() {
@@ -1044,6 +1052,81 @@ public class MipsMachine {
 
     }
 
+
+
+    public double hitRate()
+    {
+        if(attempts == 0)
+        {
+            return 0;
+        }
+        return (double) hits / attempts;
+    }
+
+    public double missRate()
+    {
+        return 1 - hitRate();
+    }
+
+    byte getFromMemory(int address)
+    {
+        attempts++;
+        hits++;
+
+        int index = address % 8;
+
+        int tag = address/8;
+
+        if (l1[index].isValid() && l1[index].tag == tag) {
+            return l1[index].data;
+        }
+
+        index = address % 16;
+
+        tag = address/16;
+
+        if (l2[index].isValid() && l2[index].tag == tag) {
+            return l2[index].data;
+        }
+
+        index = address % 32;
+
+        tag = address/32;
+
+        if (l3[index].isValid() && l3[index].tag == tag) {
+            return l3[index].data;
+        }
+
+        hits--;
+
+        return memory[address];
+    }
+
+    void sendToMemory(int address, byte data)
+    {
+        int index = address % 8;
+
+        l1[index].tag = address/8;
+        l1[index].data = data;
+
+        l1[index].setValid();
+
+        index = address % 16;
+
+        l2[index].tag = address/16;
+        l2[index].data = data;
+
+        l2[index].setValid();
+
+        index = address % 32;
+
+        l3[index].tag = address/32;
+        l3[index].data = data;
+
+        l3[index].setValid();
+
+        memory[address] = data;
+    }
 
     //HELPER METHODS
 
