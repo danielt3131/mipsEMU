@@ -757,6 +757,9 @@ public class MipsMachine {
 
     }
 
+    CacheBlock[] l1 = new CacheBlock[8];
+    CacheBlock[] l2 = new CacheBlock[16];
+    CacheBlock[] l3 = new CacheBlock[32];
 
 
     byte getFromMemory(int address)
