@@ -108,7 +108,7 @@ public class StateManager
     private static void addToByteArray(byte b)
     {
         byteArrayList.add(b);
-        Log.d("Writing File", String.format("added %d to file", b));
+        //Log.d("Writing File", String.format("added %d to file", b));
     }
 
     private static void addToByteArray(byte[] b)

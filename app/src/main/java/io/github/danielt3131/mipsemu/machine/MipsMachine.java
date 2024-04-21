@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import io.github.danielt3131.mipsemu.MachineInterface;
 import io.github.danielt3131.mipsemu.Reference;
@@ -71,7 +72,7 @@ public class MipsMachine {
     public void setInputFileStream(InputStream inputFileStream) {
         this.inputFileStream = inputFileStream;
         fileScanner = new Scanner(inputFileStream);
-        if (fileScanner.hasNext("State")) {
+        if (fileScanner.hasNext(Pattern.compile("State.*"))) {
             Log.d("inputFileStream Set", "State Header Exists, readState()");
             readState();
         } else {
@@ -233,7 +234,8 @@ public class MipsMachine {
         {
             memory[memory.length - 1 - i] = fileScanner.nextByte();
         }
-
+        sendMemory();
+        sendAllRegistersToDisplay();
 
     }
 
