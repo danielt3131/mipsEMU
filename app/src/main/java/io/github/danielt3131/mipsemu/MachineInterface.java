@@ -15,8 +15,10 @@ package io.github.danielt3131.mipsemu;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Class used for communication from {@link io.github.danielt3131.mipsemu.machine.MipsMachine} to {@link io.github.danielt3131.mipsemu.ui.MachineActivity}
@@ -24,6 +26,7 @@ import android.widget.TextView;
 public class MachineInterface {
     private TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
     private TextView[] registers;
+    private Activity activity;
 
     /**
      *
@@ -33,12 +36,13 @@ public class MachineInterface {
      * @param registers The array of registers
      * @param cacheHitRateDisplay The cache hit rate display
      */
-    public MachineInterface(TextView memoryDisplay, TextView programCounterDisplay, TextView instructionDisplay, TextView[] registers, TextView cacheHitRateDisplay) {
+    public MachineInterface(TextView memoryDisplay, TextView programCounterDisplay, TextView instructionDisplay, TextView[] registers, TextView cacheHitRateDisplay, Activity activity) {
         this.memoryDisplay = memoryDisplay;
         this.programCounterDisplay = programCounterDisplay;
         this.instructionDisplay = instructionDisplay;
         this.registers = registers;
         this.cacheHitRateDisplay = cacheHitRateDisplay;
+        this.activity = activity;
     }
 
     /**
@@ -46,16 +50,36 @@ public class MachineInterface {
      * @param memory The memory formatted
      */
     public void updateMemoryDisplay(String memory) {
-        String[] memoryArray = memory.split(" ");
-        String memoryString = "";
-        int memoryAddress = 0;
-        int i = 0;
-        while (i < memoryArray.length / 4) {
-            String memoryAddressString =  String.format("0x%6s", Integer.toHexString(memoryAddress)).replace(" ", "0");
-            memoryString = memoryString + String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]);
-            memoryAddress += 4;
-        }
-        memoryDisplay.setText("Memory\n" + memoryString);
+        final String[] finalMemoryString = {""};
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String[] memoryArray = memory.split(" ");
+                String memoryString = "";
+                int memoryAddress = 0;
+                boolean isBinary = false;
+                if (memoryArray[0].length() == 8) {
+                    isBinary = true;
+                }
+                Log.d("Memory", "Now adding addresses");
+                int i = 0;
+                while (i < memoryArray.length / 4) {
+                    String memoryAddressString =  String.format("0x%6s", Integer.toHexString(memoryAddress).toUpperCase()).replace(" ", "0");
+                    memoryString = memoryString + String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]);
+                    memoryAddress += 4;
+                }
+                finalMemoryString[0] = memoryString;
+                Log.d("Memory", "Sent to UI");
+                activity.runOnUiThread(() -> memoryDisplay.setText("Memory\n" + finalMemoryString[0]));
+                if (isBinary) {
+                    activity.runOnUiThread(() -> Toast.makeText(activity, "Now showing binary\nTold you it will take time!", Toast.LENGTH_SHORT).show());
+                }
+
+            }
+        });
+
+        thread.start();
+
         //memoryDisplay.setText("Memory\n" + memory);
     }
 

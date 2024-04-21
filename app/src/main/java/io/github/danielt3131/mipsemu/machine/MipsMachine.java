@@ -1171,16 +1171,25 @@ public class MipsMachine {
      * Method to send the memory to {@link MachineActivity} via {@link MachineInterface}
      */
     public void sendMemory() {
-        String memoryStr = "";
-        if (displayFormat == Reference.HEX_MODE) {
-            memoryStr = HexFormat.ofDelimiter(" ").formatHex(memory);
-        } else if (displayFormat == Reference.BINARY_MODE) {
-            memoryStr = binaryString();
-        } else if (displayFormat == Reference.DECIMIAL_MODE) {
-            memoryStr = Arrays.toString(memory).replace("[", "").replace("]", "").replace(",", "");
-        }
-        // Pass the memoryStr to update memory
-        machineInterface.updateMemoryDisplay(memoryStr);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String memoryStr = "";
+                if (displayFormat == Reference.HEX_MODE) {
+                    memoryStr = HexFormat.ofDelimiter(" ").formatHex(memory);
+                } else if (displayFormat == Reference.BINARY_MODE) {
+                    memoryStr = binaryString();
+                } else if (displayFormat == Reference.DECIMIAL_MODE) {
+                    memoryStr = Arrays.toString(memory).replace("[", "").replace("]", "").replace(",", "");
+                }
+                // Pass the memoryStr to update memory
+                Log.d("Memory", memoryStr.substring(0, 30));
+                machineInterface.updateMemoryDisplay(memoryStr);
+            }
+        });
+        thread.setPriority(Thread.MAX_PRIORITY);
+        thread.start();
+
     }
 
 
@@ -1197,8 +1206,18 @@ public class MipsMachine {
             // Add leading zeros and space -> 00101010 01110001 versus 1010101110001
             memoryString = memoryString + String.format("%8s", getBinary.toString(2)).replace(" ", "0") + " ";
         }
-       return memoryString;
+        return memoryString;
     }
+
+//    private String binaryString() {
+//        String memoryString = "";
+//        Log.d("Memory", String.valueOf(System.currentTimeMillis()));
+//        for (int i = 0; i < memory.length; i++) {
+//            memoryString = memoryString + String.format("%8s", Integer.toBinaryString(memory[i] )).replace(" ", "0") + " ";
+//        }
+//        Log.d("Memory", String.valueOf(System.currentTimeMillis()));
+//        return memoryString;
+//    }
     String microStepInstructions = "";
     public void sendToDisplay(String message)
     {
