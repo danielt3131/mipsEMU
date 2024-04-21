@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HexFormat;
@@ -29,6 +30,7 @@ import java.util.Scanner;
 import io.github.danielt3131.mipsemu.MachineInterface;
 import io.github.danielt3131.mipsemu.Reference;
 import io.github.danielt3131.mipsemu.ui.MachineActivity;
+import kotlin.text.Regex;
 
 /**
  * The mips emulator that will read a file written in MIPS and then execute those commands using virtual registers
@@ -622,6 +624,301 @@ public class MipsMachine {
                     return EOS;
                 }
         }
+            //Jump
+            else if(grabLeftBits(code,6) == 0b00010)
+            {
+                int t = grabRightBits(code,26);
+
+                t <<= 2;
+
+                int p = grabLeftBits(pc,4);
+                p *= (int) Math.pow(2,28);
+                t += p;
+
+                sendToDisplay(String.format(Locale.US,"Setting pc to %d", t));
+                setProgramCounter(t);
+                return EOS;
+            }
+            //Jump and Link
+            else if(grabLeftBits(code,6) == 0b00011)
+            {
+                int t = grabRightBits(code,26);
+
+                t <<= 2;
+
+                int p = grabLeftBits(pc,4);
+                p *= (int) Math.pow(2,28);
+                t += p;
+
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Placing %d in register %s", pc + 4, Reference.registerNames[31]));
+                    register[31] = pc + 4;
+                    mstep++;
+                    return 0;
+                }
+                else if (mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Setting pc to %d", t));
+                    setProgramCounter(t);
+                    return EOS;
+                }
+            }
+
+            //Branch on equal
+            else if(grabLeftBits(code,6) == 0b000100)
+            {
+                int offset = grabRightBits(code,16) << 2;
+
+                int s = grabRightBits(grabLeftBits(code,11),5);
+                int t = grabRightBits(grabLeftBits(code,16),5);
+
+                //Checking two bits compliment
+                if(offset >> 15 == 1)
+                {
+                    //make negative
+                    int mask = 0b11111111111111000000000000000000;
+                    offset += mask;
+                }
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU",register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU",register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"=\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    if(register[s] == register[t])
+                    {
+                        sendToDisplay(String.format(Locale.US,"register %s and %s match, will branch", Reference.registerNames[s],Reference.registerNames[t]));
+                    }
+                    else
+                    {
+                        sendToDisplay(String.format(Locale.US,"register %s and %s do NOT match, will NOT branch", Reference.registerNames[s],Reference.registerNames[t]));
+                    }
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    if(register[s] == register[t])
+                    {
+                        sendToDisplay("Setting PC to " + (pc + offset));
+                        setProgramCounter(pc+offset);
+                    }
+                    else
+                    {
+                        sendToDisplay("Increasing PC by 4");
+                        increaseProgramCounter(4);
+                    }
+                    mstep = 0;
+                    return EOS;
+                }
+
+
+
+            }
+            //Branch on NOT equal
+            else if(grabLeftBits(code,6) == 0b000101)
+            {
+                int offset = grabRightBits(code,16) << 2;
+
+                int s = grabRightBits(grabLeftBits(code,11),5);
+                int t = grabRightBits(grabLeftBits(code,16),5);
+
+                //Checking two bits compliment
+                if(offset >> 15 == 1)
+                {
+                    //make negative
+                    int mask = 0b11111111111111000000000000000000;
+                    offset += mask;
+                }
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU",register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU",register[t]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"!=\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    if(register[s] != register[t])
+                    {
+                        sendToDisplay(String.format(Locale.US,"register %s and %s do NOT match, will branch", Reference.registerNames[s],Reference.registerNames[t]));
+                    }
+                    else
+                    {
+                        sendToDisplay(String.format(Locale.US,"register %s and %s do match, will NOT branch", Reference.registerNames[s],Reference.registerNames[t]));
+                    }
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    if(register[s] != register[t])
+                    {
+                        sendToDisplay("Setting PC to " + (pc + offset));
+                        setProgramCounter(pc+offset);
+                    }
+                    else
+                    {
+                        sendToDisplay("Increasing PC by 4");
+                        increaseProgramCounter(4);
+                    }
+                    mstep = 0;
+                    return EOS;
+                }
+
+
+
+            }
+            //Branch <= 0
+            else if(grabLeftBits(code,6) == 0b000110)
+            {
+                int offset = grabRightBits(code,16) << 2;
+
+                int s = grabRightBits(grabLeftBits(code,11),5);
+
+                //Checking two bits compliment
+                if(offset >> 15 == 1)
+                {
+                    //make negative
+                    int mask = 0b11111111111111000000000000000000;
+                    offset += mask;
+                }
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU",register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU",0));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \"<=\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    if(register[s] <= 0)
+                    {
+                        sendToDisplay(String.format(Locale.US,"register %s is less than or equal to %s, will branch", Reference.registerNames[s],Reference.registerNames[0]));
+                    }
+                    else
+                    {
+                        sendToDisplay(String.format(Locale.US,"register %s is NOT less than or equal to %s, will NOT branch", Reference.registerNames[s],Reference.registerNames[0]));
+                    }
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    if(register[s] <= 0)
+                    {
+                        sendToDisplay("Setting PC to " + (pc + offset));
+                        setProgramCounter(pc+offset);
+                    }
+                    else
+                    {
+                        sendToDisplay("Increasing PC by 4");
+                        increaseProgramCounter(4);
+                    }
+                    mstep = 0;
+                    return EOS;
+                }
+
+            }
+            //Branch > 0
+            else if(grabLeftBits(code,6) == 0b000001)
+            {
+                int offset = grabRightBits(code,16) << 2;
+
+                int s = grabRightBits(grabLeftBits(code,11),5);
+
+                //Checking two bits compliment
+                if(offset >> 15 == 1)
+                {
+                    //make negative
+                    int mask = 0b11111111111111000000000000000000;
+                    offset += mask;
+                }
+                if(mstep == 0)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU",register[s]));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 1)
+                {
+                    sendToDisplay(String.format(Locale.US,"Sending %d to ALU",0));
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 2)
+                {
+                    sendToDisplay("Sending \">\" to ALU");
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 4)
+                {
+                    if(register[s] > 0)
+                    {
+                        sendToDisplay(String.format(Locale.US,"register %s is greater than %s, will branch", Reference.registerNames[s],Reference.registerNames[0]));
+                    }
+                    else
+                    {
+                        sendToDisplay(String.format(Locale.US,"register %s is NOT greater than %s, will NOT branch", Reference.registerNames[s],Reference.registerNames[0]));
+                    }
+                    mstep++;
+                    return 0;
+                }
+                else if(mstep == 5)
+                {
+                    if(register[s] > 0)
+                    {
+                        sendToDisplay("Setting PC to " + (pc + offset));
+                        setProgramCounter(pc+offset);
+                    }
+                    else
+                    {
+                        sendToDisplay("Increasing PC by 4");
+                        increaseProgramCounter(4);
+                    }
+                    mstep = 0;
+                    return EOS;
+                }
+
+            }
             //Addi
             else if(grabLeftBits(code, 6) == 0b001000)
             {
