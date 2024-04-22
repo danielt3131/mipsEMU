@@ -14,7 +14,6 @@
 package io.github.danielt3131.mipsemu.ui;
 
 import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -59,11 +58,12 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
     TextView[] registerDisplays;
     private final int FILE_OPEN_REQUEST = 4;
-    Uri inputFileUri, outputFileUri;
+    Uri inputFileUri, outputFileUri, instructionFileUri;
     MipsMachine mipsMachine;
     MachineInterface machineInterface;
     InputStream fileInputStream;
     private boolean gotInputStream = false;
+    private int memorySize = 1000*100*5;    // Default limit 500 KB
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,11 +112,18 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Create Machine interface
         machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDisplays, cacheHitRateDisplay, this);
+
+        // Get the amount of memory available -> Java heap limit
         ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
         activityManager.getMemoryInfo(memoryInfo);
         Log.d("Memory", String.valueOf(memoryInfo.availMem));
         Log.d("Memory", String.valueOf(activityManager.getMemoryClass()));
+
+        // For devices with low memory
+        if (memoryInfo.lowMemory) {
+            memorySize = 1000*50;   // 50 KB
+        }
         // Create the machine
         createMipsMachine();
 
@@ -152,7 +159,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     // Create Mips Machine method
 
     private void createMipsMachine() {
-        mipsMachine = new MipsMachine(1000*100*5, machineInterface, this);
+        mipsMachine = new MipsMachine(memorySize, machineInterface, this);
     }
 
     /**
