@@ -14,6 +14,7 @@
 
 package io.github.danielt3131.mipsemu.machine;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -1389,14 +1390,14 @@ public class MipsMachine {
         instructionLogWriter.println(microStepInstructions);
     }
 
-    public void saveState(OutputStream outputStream) throws IOException {
+    public void saveState(OutputStream outputStream, Uri outputFileUri, Activity activity) throws IOException {
         // Write header
 //        PrintWriter printWriter = new PrintWriter(outputStream);
 //        printWriter.println("State");
 //        printWriter.close();
         // Save the save
         Log.d("saveState", "Starting to save the state");
-        StateManager.toFile(outputStream, register, pc, hi, lo, memory);
+        StateManager.toFile(outputStream, register, pc, hi, lo, memory, outputFileUri, activity);
     }
 
     /**
