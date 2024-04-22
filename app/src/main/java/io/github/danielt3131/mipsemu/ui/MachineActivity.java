@@ -76,13 +76,14 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         });
         // Force portrait mode
         int screenSize = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
-        if (screenSize >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+        /*if (screenSize >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             Log.d("Screen", "Tablet");
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             Log.d("Screen", "Phone");
-        }
+        }*/
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         // Set toolbar
         machineToolbar = findViewById(R.id.materialToolbar);
 
@@ -118,7 +119,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         // Create the machine
         createMipsMachine();
 
-        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+        if (screenSize >= Configuration.SCREENLAYOUT_SIZE_XLARGE) {
             memoryDisplay.setTextSize(32);  // Hacky fix for tablets
         } else {
             // Screen width
