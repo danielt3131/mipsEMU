@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +58,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     RadioButton decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
     TextView[] registerDisplays;
+    ScrollView memoryScrollView;
     private final int FILE_OPEN_REQUEST = 4;
     Uri inputFileUri;
     Uri outputFileUri;
@@ -95,6 +97,8 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         instructionDisplay = findViewById(R.id.instructionDisplay);
         cacheHitRateDisplay = findViewById(R.id.cacheHitRate);
 
+        // Set ScrollView
+        memoryScrollView = findViewById(R.id.memoryScrollView);
         // Inflate the registers
         inflateRegisters();
 
@@ -321,7 +325,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
                 outputFileUri = data.getData();
                 try {
                     OutputStream outputStream = getContentResolver().openOutputStream(outputFileUri);
-                    mipsMachine.saveState(outputStream);
+                    mipsMachine.saveState(outputStream, outputFileUri, this);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -392,6 +396,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             if (gotInputStream) {
                 // Run microstep
                 mipsMachine.runNextMicroStep();
+                memoryScrollView.fullScroll(View.FOCUS_DOWN);
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }
@@ -404,6 +409,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             if (gotInputStream) {
                 // Run one step
                 mipsMachine.runNextStep();
+                memoryScrollView.fullScroll(View.FOCUS_UP);
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }
