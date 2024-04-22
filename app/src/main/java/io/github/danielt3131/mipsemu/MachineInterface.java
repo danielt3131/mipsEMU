@@ -108,7 +108,7 @@ public class MachineInterface {
      * @param instructions The instructions to display
      */
     public void updateInstructionDisplay(String instructions) {
-        instructionDisplay.setText("Instructions:" + instructions);
+        instructionDisplay.post(() -> instructionDisplay.setText("Instructions:" + instructions));
     }
 
     /**
@@ -117,7 +117,7 @@ public class MachineInterface {
      * @param registerValue The register value
      */
     public void updateIndividualRegister(int register, String registerValue) {
-        registers[register].setText(Reference.registerNames[register] + ": " + registerValue);
+        registers[register].post(() -> registers[register].setText(Reference.registerNames[register] + ": " + registerValue));
         Log.d("Updated Register: " + Reference.registerNames[register], registerValue);
     }
 
@@ -126,14 +126,17 @@ public class MachineInterface {
      * @param registerValues The string array containing the value of every register
      */
     public void updateAllRegisters(String[] registerValues) {
-        for (int i = 0; i < registers.length; i++) {
-            try {
-                registers[i].setText(Reference.registerNames[i] + ": " + registerValues[i]);
-                Log.d("Updated Register: " + Reference.registerNames[i], registerValues[i]);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                Log.e("Update Register", e.getMessage());
+        activity.runOnUiThread(() -> {
+            for (int i = 0; i < registers.length; i++) {
+                try {
+                    registers[i].setText(Reference.registerNames[i] + ": " + registerValues[i]);
+                    Log.d("Updated Register: " + Reference.registerNames[i], registerValues[i]);
+
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    Log.e("Update Register", e.getMessage());
+                }
             }
-        }
+        });
     }
 
     /**
@@ -141,7 +144,7 @@ public class MachineInterface {
      * @param cacheHitRate The cache hit rate value
      */
     public void updateCacheHitDisplay(String cacheHitRate) {
-        cacheHitRateDisplay.setText("Cache Hits: " + cacheHitRate);
+        cacheHitRateDisplay.post(() -> cacheHitRateDisplay.setText("Cache Hits: " + cacheHitRate));
     }
 
     /**
