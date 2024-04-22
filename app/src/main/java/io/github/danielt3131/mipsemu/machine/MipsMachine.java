@@ -710,6 +710,13 @@ public class MipsMachine {
                 int t = grabRightBits(grabLeftBits(code, 16), 5); //destination
                 int b = grabRightBits(grabLeftBits(code, 11), 5); //base
                 int o = grabRightBits(code, 16); //offset register
+
+                if(o >> 15 == 1)
+                {
+                    int mask = 0b11111111111111110000000000000000;
+                    o += mask;
+                }
+
                 int address = register[b] + o;
                 int value = combineBytes(getFromMemory(address), getFromMemory(address + 1), getFromMemory(address + 2), getFromMemory(address + 3));
 
