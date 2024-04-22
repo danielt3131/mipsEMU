@@ -68,7 +68,7 @@ public class MachineInterface {
                 //memoryDisplay.append("Memory\n");
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("Memory\n");
-                while (i < memoryArray.length / 4) {
+                while (i < memoryArray.length) {
                     String memoryAddressString =  String.format("0x%6s", Integer.toHexString(memoryAddress)).replace(" ", "0");
                     //memoryDisplay.append(String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]));
                     stringBuilder.append(String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]));
