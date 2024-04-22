@@ -89,6 +89,7 @@ public class MipsMachine {
         mstep = 0;
         code = 1;
         readFile = false;
+        Log.d("memory siz", "" + (memory.length));
         register[29] = memory.length - 4;
         this.machineContext = machineContext;
         try {
