@@ -13,9 +13,13 @@
  */
 package io.github.danielt3131.mipsemu.machine;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.LongDef;
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -51,7 +55,7 @@ public class StateManager
     the text
     ...
      */
-    public static void toFile(OutputStream outputStream, int[] register, int pc, int hi, int lo, byte[] memory) {
+    public static void toFile(OutputStream outputStream, int[] register, int pc, int hi, int lo, byte[] memory, Uri outputFileUri, Activity activity) {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -64,6 +68,17 @@ public class StateManager
                 }
                 write.flush();
                 write.close();
+                activity.runOnUiThread(() -> {
+                    // Get share screen | Run on UI thread
+                    Intent stateShareIntent = new Intent(Intent.ACTION_SEND);
+                    stateShareIntent.setType("text/plain");   // Set the type to a plain text file
+                    stateShareIntent.putExtra(Intent.EXTRA_STREAM, outputFileUri);   // The file Uri
+                    stateShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    // Get the share sheet instead of intent resolver see https://developer.android.com/training/sharing/send
+                    stateShareIntent = Intent.createChooser(stateShareIntent, null);
+                    activity.startActivity(stateShareIntent);
+                });
+
                 Log.d("StateManager", "State saved");
             }
         });
