@@ -58,7 +58,8 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
     TextView[] registerDisplays;
     private final int FILE_OPEN_REQUEST = 4;
-    Uri inputFileUri, outputFileUri, instructionFileUri;
+    Uri inputFileUri;
+    Uri outputFileUri;
     MipsMachine mipsMachine;
     MachineInterface machineInterface;
     InputStream fileInputStream;
