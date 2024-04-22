@@ -37,15 +37,16 @@
         app:layout_constraintTop_toBottomOf="@+id/materialToolbar">
 
         <ScrollView
+            android:id="@+id/memoryScrollView"
             android:layout_width="match_parent"
             android:layout_height="408dp"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/memoryView"
-                android:fontFamily="monospace"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace" />
 
         </ScrollView>
 
