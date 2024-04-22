@@ -99,7 +99,7 @@ public class MachineInterface {
      * @param programCounter The program counter as a string
      */
     public void updateProgramCounter(String programCounter) {
-        programCounterDisplay.setText("Program Counter: " + programCounter);
+        programCounterDisplay.post(() -> programCounterDisplay.setText("Program Counter: " + programCounter));
     }
 
 
