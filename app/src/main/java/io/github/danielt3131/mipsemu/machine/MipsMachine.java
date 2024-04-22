@@ -350,8 +350,22 @@ public class MipsMachine {
         }
     }
 
+    /**
+     * Shows a Toast message that there is no more instructions to execute
+     * <p>
+     * Calls shareInstructionLog() to share the instruction log to the user
+     */
     private void showCompletedToast() {
         Toast.makeText(machineContext, "No more instructions to execute", Toast.LENGTH_LONG).show();
+        shareInstructionLog();
+    }
+
+    /**
+     * Shares the instruction log to the user via the system share sheet via Intent
+     * <p>
+     * See <a href="https://developer.android.com/training/sharing/send">...</a>
+     */
+    private void shareInstructionLog() {
         instructionLogWriter.close();
         // Share the instruction log -> pull up share menu
         Intent instructionShareIntent = new Intent(Intent.ACTION_SEND);
