@@ -152,14 +152,16 @@ public class MachineInterface {
      */
     public void clearAll() {
         String blank = "";
+        /*
         String[] blankRegisters = new String[registers.length];
         for (int i = 0; i < blankRegisters.length; i++) {
             blankRegisters[i] = blank;
         }
-        updateAllRegisters(blankRegisters);
+         */
+        //updateAllRegisters(blankRegisters);
         updateProgramCounter(blank);
         updateCacheHitDisplay(blank);
-        updateMemoryDisplay(blank);
+        //updateMemoryDisplay(blank);
         updateInstructionDisplay(blank);
     }
 }
