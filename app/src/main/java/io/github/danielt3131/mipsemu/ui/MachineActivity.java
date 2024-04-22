@@ -14,6 +14,7 @@
 package io.github.danielt3131.mipsemu.ui;
 
 import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -151,7 +152,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     // Create Mips Machine method
 
     private void createMipsMachine() {
-        mipsMachine = new MipsMachine(1000*100*5, machineInterface);
+        mipsMachine = new MipsMachine(1000*100*5, machineInterface, this);
     }
 
     /**

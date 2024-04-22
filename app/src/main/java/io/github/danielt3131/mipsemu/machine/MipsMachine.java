@@ -14,7 +14,10 @@
 
 package io.github.danielt3131.mipsemu.machine;
 
+import android.content.Context;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,18 +63,21 @@ public class MipsMachine {
     private int displayFormat;
     private Scanner fileScanner;
     private boolean readFile;
+    private Context machineContext;
 
     /**
      * Constructor for the mips emulator
      *
      * @param memorySize the amount of memory the machine will have in bytes
      */
-    public MipsMachine(int memorySize, MachineInterface machineInterface) {
+    public MipsMachine(int memorySize, MachineInterface machineInterface, Context machineContext) {
 
         memory = new byte[memorySize];
         this.machineInterface = machineInterface;
         mstep = 0;
+        code = 1;
         readFile = false;
+        this.machineContext = machineContext;
 
     }
 
@@ -79,14 +85,17 @@ public class MipsMachine {
         this.inputFileStream = inputFileStream;
         Thread thread = new Thread(() -> {
             fileScanner = new Scanner(inputFileStream);
+            Looper.prepare();
             if (fileScanner.hasNext(Pattern.compile("State.*"))) {
                 Log.d("inputFileStream Set", "State Header Exists, readState()");
                 readState();
+                Toast.makeText(machineContext, "Read in state", Toast.LENGTH_SHORT).show();
                 readFile = true;
             } else {
                 Log.d("inputFileStream Set", "State Header Does Not Exist, readFile()");
                 readFile();
                 readFile = true;
+                Toast.makeText(machineContext, "Read in file", Toast.LENGTH_SHORT).show();
             }
         });
         thread.start();
@@ -277,10 +286,14 @@ public class MipsMachine {
      * Method to run the next step as requested from the user or MipsMachine
      */
     public void runNextStep() {
-        if (readFile) {
+        if (readFile && code != 0) {
             nextStep();
             sendAllRegistersToDisplay();
             machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        } else if (code == 0) {
+            showCompletedToast();
+        } else {
+            Toast.makeText(machineContext, "Still reading in the file", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -288,10 +301,14 @@ public class MipsMachine {
      * Method to run next micro step as requested from the user or MipsMachine
      */
     public void runNextMicroStep() {
-        if (readFile) {
+        if (readFile && code != 0) {
             nextMicroStep();
             sendAllRegistersToDisplay();
             machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        } else if (code == 0) {
+            showCompletedToast();
+        } else {
+            Toast.makeText(machineContext, "Still reading in the file", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -301,14 +318,23 @@ public class MipsMachine {
     public void runContinuously() {
         // Run continuously
         // Don't update the memory display
-        if (readFile) {
-            while (code != 0) {
-                nextStep();
-            }
-            sendAllRegistersToDisplay();
-            sendMemory();
-            machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        if (readFile && code != 0) {
+            Thread thread = new Thread(() -> {
+                Looper.prepare();
+                while (code != 0) {
+                    nextStep();
+                }
+                showCompletedToast();
+                sendAllRegistersToDisplay();
+                sendMemory();
+                machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+            });
+            thread.start();
         }
+    }
+
+    private void showCompletedToast() {
+        Toast.makeText(machineContext, "No more instructions to execute", Toast.LENGTH_LONG).show();
     }
 
     private int nextMicroStep() {
