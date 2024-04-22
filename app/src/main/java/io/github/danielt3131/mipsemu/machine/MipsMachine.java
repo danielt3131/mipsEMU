@@ -15,13 +15,21 @@
 package io.github.danielt3131.mipsemu.machine;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.sql.Ref;
 import java.util.ArrayList;
@@ -32,6 +40,7 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import io.github.danielt3131.mipsemu.MachineInterface;
+import io.github.danielt3131.mipsemu.R;
 import io.github.danielt3131.mipsemu.Reference;
 import io.github.danielt3131.mipsemu.ui.MachineActivity;
 import kotlin.text.Regex;
@@ -62,8 +71,10 @@ public class MipsMachine {
     private InputStream inputFileStream;
     private int displayFormat;
     private Scanner fileScanner;
+    private PrintWriter instructionLogWriter;
     private boolean readFile;
     private Context machineContext;
+    private String instructionLogFilename = "instructions.txt";
 
     /**
      * Constructor for the mips emulator
@@ -78,6 +89,12 @@ public class MipsMachine {
         code = 1;
         readFile = false;
         this.machineContext = machineContext;
+        try {
+            // Create a Print Writer object to save the instructions to be shared at the end using a buffer writer. -> Stored in internal storage
+            instructionLogWriter = new PrintWriter(new BufferedWriter(new FileWriter(new File(machineContext.getFilesDir(), instructionLogFilename))));
+        } catch (IOException e) {
+            Log.e("Instruction Log", e.getMessage());
+        }
 
     }
 
@@ -335,6 +352,17 @@ public class MipsMachine {
 
     private void showCompletedToast() {
         Toast.makeText(machineContext, "No more instructions to execute", Toast.LENGTH_LONG).show();
+        instructionLogWriter.close();
+        // Share the instruction log -> pull up share menu
+        Intent instructionShareIntent = new Intent(Intent.ACTION_SEND);
+        // Get a Uri from File
+        Uri instructionUri = FileProvider.getUriForFile(machineContext, "io.github.danielt3131.mipsemu.provider", new File(machineContext.getFilesDir(), instructionLogFilename));
+        instructionShareIntent.setType("text/plain");   // Set the type to a plain text file
+        instructionShareIntent.putExtra(Intent.EXTRA_STREAM, instructionUri);   // The file Uri
+        instructionShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        // Get the share sheet instead of intent resolver see https://developer.android.com/training/sharing/send
+        instructionShareIntent = Intent.createChooser(instructionShareIntent, null);
+        machineContext.startActivity(instructionShareIntent);
     }
 
     private int nextMicroStep() {
@@ -1335,6 +1363,7 @@ public class MipsMachine {
         Log.d("Step", message);
         microStepInstructions = microStepInstructions + "\n" + message;
         machineInterface.updateInstructionDisplay(microStepInstructions);
+        instructionLogWriter.println(microStepInstructions);
     }
 
     public void saveState(OutputStream outputStream) throws IOException {
