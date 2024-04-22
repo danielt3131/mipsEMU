@@ -114,6 +114,7 @@ public class MipsMachine {
                 readFile = true;
                 Toast.makeText(machineContext, "Read in file", Toast.LENGTH_SHORT).show();
             }
+            fileScanner.close();
         });
         thread.start();
     }
