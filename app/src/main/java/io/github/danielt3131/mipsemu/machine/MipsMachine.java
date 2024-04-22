@@ -98,6 +98,14 @@ public class MipsMachine {
 
     }
 
+    /**
+     * Close all file streams for {@link MachineActivity} onDestroy() to prevent resource leak
+     */
+    public void onDestroy() {
+        fileScanner.close();
+        instructionLogWriter.close();
+    }
+
     public void setInputFileStream(InputStream inputFileStream) {
         this.inputFileStream = inputFileStream;
         Thread thread = new Thread(() -> {

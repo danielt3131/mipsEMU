@@ -157,9 +157,17 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     }
 
     // Create Mips Machine method
-
     private void createMipsMachine() {
         mipsMachine = new MipsMachine(memorySize, machineInterface, this);
+    }
+
+    /**
+     * Destroys the activity
+     */
+    @Override
+    protected void onDestroy() {
+        mipsMachine.onDestroy();    // Ensure that the file streams are closed
+        super.onDestroy();
     }
 
     /**
@@ -251,6 +259,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
      * Method to reset the machine
      */
     private void resetMachine() {
+        mipsMachine.onDestroy();    // Ensure that the file streams are closed
         mipsMachine = null; // Deallocate the object
         System.gc();// Call the garbage collector to clean up mipsMachine
         gotInputStream = false; // Require a new file selection
