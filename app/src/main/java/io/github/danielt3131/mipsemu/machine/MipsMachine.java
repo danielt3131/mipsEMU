@@ -59,6 +59,7 @@ public class MipsMachine {
     private InputStream inputFileStream;
     private int displayFormat;
     private Scanner fileScanner;
+    private boolean readFile;
 
     /**
      * Constructor for the mips emulator
@@ -70,6 +71,7 @@ public class MipsMachine {
         memory = new byte[memorySize];
         this.machineInterface = machineInterface;
         mstep = 0;
+        readFile = false;
 
     }
 
@@ -80,9 +82,11 @@ public class MipsMachine {
             if (fileScanner.hasNext(Pattern.compile("State.*"))) {
                 Log.d("inputFileStream Set", "State Header Exists, readState()");
                 readState();
+                readFile = true;
             } else {
                 Log.d("inputFileStream Set", "State Header Does Not Exist, readFile()");
                 readFile();
+                readFile = true;
             }
         });
         thread.start();
@@ -273,18 +277,22 @@ public class MipsMachine {
      * Method to run the next step as requested from the user or MipsMachine
      */
     public void runNextStep() {
-        nextStep();
-        sendAllRegistersToDisplay();
-        machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        if (readFile) {
+            nextStep();
+            sendAllRegistersToDisplay();
+            machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        }
     }
 
     /**
      * Method to run next micro step as requested from the user or MipsMachine
      */
     public void runNextMicroStep() {
-        nextMicroStep();
-        sendAllRegistersToDisplay();
-        machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        if (readFile) {
+            nextMicroStep();
+            sendAllRegistersToDisplay();
+            machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        }
     }
 
     /**
@@ -293,12 +301,14 @@ public class MipsMachine {
     public void runContinuously() {
         // Run continuously
         // Don't update the memory display
-        while (code != 0) {
-            nextStep();
+        if (readFile) {
+            while (code != 0) {
+                nextStep();
+            }
+            sendAllRegistersToDisplay();
+            sendMemory();
+            machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
         }
-        sendAllRegistersToDisplay();
-        sendMemory();
-        machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
     }
 
     private int nextMicroStep() {
