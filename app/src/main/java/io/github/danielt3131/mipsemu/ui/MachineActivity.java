@@ -221,7 +221,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         }
         if (item.getItemId() == R.id.editPC) {
             // Pull up a dialog box for the user to edit the PC (Program Counter) variable
-            DialogFragment dialogFragment = new ProgramCounterDialog();
+            DialogFragment dialogFragment = new ProgramCounterDialog(String.valueOf(mipsMachine.getProgramCounter()));
             dialogFragment.show(getSupportFragmentManager(), "pc");
             return true;
         }
