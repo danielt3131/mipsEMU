@@ -75,14 +75,17 @@ public class MipsMachine {
 
     public void setInputFileStream(InputStream inputFileStream) {
         this.inputFileStream = inputFileStream;
-        fileScanner = new Scanner(inputFileStream);
-        if (fileScanner.hasNext(Pattern.compile("State.*"))) {
-            Log.d("inputFileStream Set", "State Header Exists, readState()");
-            readState();
-        } else {
-            Log.d("inputFileStream Set", "State Header Does Not Exist, readFile()");
-            readFile();
-        }
+        Thread thread = new Thread(() -> {
+            fileScanner = new Scanner(inputFileStream);
+            if (fileScanner.hasNext(Pattern.compile("State.*"))) {
+                Log.d("inputFileStream Set", "State Header Exists, readState()");
+                readState();
+            } else {
+                Log.d("inputFileStream Set", "State Header Does Not Exist, readFile()");
+                readFile();
+            }
+        });
+        thread.start();
     }
 
     /**
@@ -240,7 +243,6 @@ public class MipsMachine {
         }
         sendMemory();
         sendAllRegistersToDisplay();
-
     }
 
     private int getCode()
