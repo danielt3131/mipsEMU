@@ -120,8 +120,8 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         // Create the machine
         createMipsMachine();
 
-        if (screenSize >= Configuration.SCREENLAYOUT_SIZE_XLARGE) {
-            memoryDisplay.setTextSize(32);  // Hacky fix for tablets
+        if (screenSize >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+            memoryDisplay.setTextSize(28);  // Hacky fix for tablets
         } else {
             // Screen width
             float screenWidth = getWindowManager().getCurrentWindowMetrics().getBounds().width();
@@ -142,7 +142,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         decimalMode.setOnClickListener(decimalModeListener);
         hexMode.setOnClickListener(hexModeListener);
         binaryMode.setOnClickListener(binaryModeListener);
-        memoryDisplay.setMovementMethod(new ScrollingMovementMethod());
+        //memoryDisplay.setMovementMethod(new ScrollingMovementMethod());
         instructionDisplay.setMovementMethod(new ScrollingMovementMethod());
         runMicroStep.setOnClickListener(runMicroStepListener);
         runOneTime.setOnClickListener(runOneStepListener);
