@@ -117,10 +117,12 @@ public class MipsMachine {
                 readState();
                 Toast.makeText(machineContext, "Read in state", Toast.LENGTH_SHORT).show();
                 readFile = true;
+                sendMemory();
             } else {
                 Log.d("inputFileStream Set", "State Header Does Not Exist, readFile()");
                 readFile();
                 readFile = true;
+                sendMemory();
                 Toast.makeText(machineContext, "Read in file", Toast.LENGTH_SHORT).show();
             }
             fileScanner.close();
@@ -283,6 +285,7 @@ public class MipsMachine {
         }
         sendMemory();
         sendAllRegistersToDisplay();
+        sendProgramCounter();
     }
 
     private int getCode()

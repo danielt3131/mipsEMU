@@ -159,6 +159,25 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         runMicroStep.setOnClickListener(runMicroStepListener);
         runOneTime.setOnClickListener(runOneStepListener);
         runContinously.setOnClickListener(runContinuouslyListener);
+
+        // From other apps / share menu
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        if (type != null) {
+            Log.d("Intent", type);
+        }
+        if (Intent.ACTION_SEND.equals(action) && "application/txt".equals(type)) {
+            inputFileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            gotInputStream = true;
+            try {
+                fileInputStream = getContentResolver().openInputStream(inputFileUri);
+                mipsMachine.setInputFileStream(fileInputStream);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     }
 
     // Create Mips Machine method
