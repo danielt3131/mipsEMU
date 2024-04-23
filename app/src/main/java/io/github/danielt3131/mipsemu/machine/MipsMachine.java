@@ -722,12 +722,15 @@ public class MipsMachine {
                     o += mask;
                 }
 
-                int address = register[b] + o;
+                Log.d("OFFSET LOAD","" + o);
+
+                int address = register[29] + o;
+                Log.d("ADDRESS LOAD", "" + address);
                 int value = combineBytes(getFromMemory(address), getFromMemory(address + 1), getFromMemory(address + 2), getFromMemory(address + 3));
 
 
                 if (mstep == 0) {
-                    sendToDisplay(String.format(Locale.US, "Grabbing %d from memory %d", value, address));
+                    sendToDisplay(String.format(Locale.US, "Grabbing %d from memory %s", value, Integer.toHexString(address)));
                     mstep++;
                     return 0;
                 } else if (mstep == 1) {
@@ -754,7 +757,10 @@ public class MipsMachine {
                     o += mask;
                 }
 
-                int address = register[b] + o;
+                Log.d("OFFSET STORE","" + o);
+
+                int address = register[29] + o;
+                Log.d("ADDRESS STORE", "" + address);
 
                 if (mstep == 0) {
                     sendToDisplay(String.format(Locale.US, "Grabbing %d from register %s", register[s], Reference.registerNames[s]));
@@ -773,6 +779,9 @@ public class MipsMachine {
                     sendToMemory(address + 2, p3);
                     sendToMemory(address + 3, p4);
 
+
+                    sendMemory();   // Update the memory display -> will take time
+
                     mstep ++;
                     return 0;
                 } else if (mstep == 2){
@@ -781,7 +790,6 @@ public class MipsMachine {
                     mstep=0;
                     return EOS;
                 }
-                sendMemory();   // Update the memory display -> will take time
             }
             //Jump
             else if (grabLeftBits(code, 6) == 0b000010) {
@@ -1296,15 +1304,7 @@ public class MipsMachine {
      * @return the combination
      */
     private int combineBytes(byte b1, byte b2, byte b3, byte b4) {
-        Log.d("combine bytes",  Integer.toBinaryString(b1));
-        Log.d("combine bytes", Integer.toBinaryString(b2));
-        Log.d("combine bytes", Integer.toBinaryString(b3));
-        Log.d("combine bytes", Integer.toBinaryString(b4));
-        int result = ((0xFF & b1) << 24) | ((0xFF & b2) << 16) | ((0xFF & b3) << 8) | (0xFF & b4);
-
-
-        Log.d("combine bytes", Integer.toBinaryString(result));
-        return result;
+        return ((0xFF & b1) << 24) | ((0xFF & b2) << 16) | ((0xFF & b3) << 8) | (0xFF & b4);
     }
 
     /**
