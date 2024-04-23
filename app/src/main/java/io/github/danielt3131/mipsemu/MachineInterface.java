@@ -54,39 +54,25 @@ public class MachineInterface {
      */
     public void updateMemoryDisplay(String memory) {
         final String[] finalMemoryString = {""};
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String[] memoryArray = memory.split(" ");
-                int memoryAddress = 0;
-                boolean isBinary = false;
-                if (memoryArray[0].length() == 8) {
-                    isBinary = true;
-                }
-                Log.d("Memory", "Now adding addresses");
-                int i = 0;
-                //memoryDisplay.append("Memory\n");
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Memory\n");
-                while (i < memoryArray.length) {
-                    String memoryAddressString =  String.format("0x%6s", Integer.toHexString(memoryAddress)).replace(" ", "0");
-                    //memoryDisplay.append(String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]));
-                    stringBuilder.append(String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]));
-                    memoryAddress += 4;
-                }
-                finalMemoryString[0] = stringBuilder.toString();
-                Log.d("Memory", "Computing display");
-                preComputedMemoryDisplay = PrecomputedText.create(finalMemoryString[0], memoryDisplay.getTextMetricsParams());
-                Log.d("Memory", "Sent to UI");
-                memoryDisplay.post(() -> {
-                    memoryDisplay.setText(preComputedMemoryDisplay);
-                });
-                //activity.runOnUiThread(() -> memoryDisplay.setText(preComputedMemoryDisplay));
-                if (isBinary) {
-                    activity.runOnUiThread(() -> Toast.makeText(activity, "Now showing binary\nTold you it will take time!", Toast.LENGTH_SHORT).show());
-                }
-
+        Thread thread = new Thread(() -> {
+            String[] memoryArray = memory.split(" ");
+            int memoryAddress = 0;
+            Log.d("Memory", "Now adding addresses");
+            int i = 0;
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Memory\n");
+            while (i < memoryArray.length) {
+                String memoryAddressString =  String.format("0x%6s", Integer.toHexString(memoryAddress)).replace(" ", "0");
+                stringBuilder.append(String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]));
+                memoryAddress += 4;
             }
+            finalMemoryString[0] = stringBuilder.toString();
+            Log.d("Memory", "Computing display");
+            preComputedMemoryDisplay = PrecomputedText.create(finalMemoryString[0], memoryDisplay.getTextMetricsParams());
+            Log.d("Memory", "Sent to UI");
+            memoryDisplay.post(() -> {
+                memoryDisplay.setText(preComputedMemoryDisplay);
+            });
         });
 
         thread.start();
@@ -148,20 +134,11 @@ public class MachineInterface {
     }
 
     /**
-     * Method to clear all the displays when the machine is reset
+     * Method to clear the cache hit and instruction displays when the machine is reset
      */
     public void clearAll() {
         String blank = "";
-        /*
-        String[] blankRegisters = new String[registers.length];
-        for (int i = 0; i < blankRegisters.length; i++) {
-            blankRegisters[i] = blank;
-        }
-         */
-        //updateAllRegisters(blankRegisters);
-        updateProgramCounter(blank);
         updateCacheHitDisplay(blank);
-        //updateMemoryDisplay(blank);
         updateInstructionDisplay(blank);
     }
 }

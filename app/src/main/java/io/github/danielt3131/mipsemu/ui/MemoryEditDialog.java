@@ -26,56 +26,56 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.view.LayoutInflaterCompat;
+import androidx.appcompat.app.AlertDialog;;
 import androidx.fragment.app.DialogFragment;
 
 import io.github.danielt3131.mipsemu.R;
 
-public class ProgramCounterDialog extends DialogFragment {
-    private String programCounterValue;
-    public ProgramCounterDialog(String programCounterValue) {
-        this.programCounterValue = programCounterValue;
+public class MemoryEditDialog extends DialogFragment {
+    private String currentMemoryValue;
+    public MemoryEditDialog(String currentMemoryValue) {
+        this.currentMemoryValue = currentMemoryValue;
     }
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view  = inflater.inflate(R.layout.dialog_programcounter, null);
+        View view  = inflater.inflate(R.layout.dialog_memoryset, null);
         builder.setView(view);
-        builder.setTitle("Program Counter Edit: " + programCounterValue);
-        EditText text = view.findViewById(R.id.editPCValue);
+        builder.setTitle("Set Machine Memory\nCurrent Value in KB: " + currentMemoryValue);
+        EditText text = view.findViewById(R.id.editMemorySize);
         builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.d("PC Edit", String.valueOf(text.getText()));
-                listener.onPositiveClick(ProgramCounterDialog.this, text.getText().toString());
+                Log.d("Memory Size: KB", String.valueOf(text.getText()));
+                listener.onPositiveClick(MemoryEditDialog.this, Integer.parseInt(text.getText().toString()));
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getContext(), "The program counter hasn't been modified", Toast.LENGTH_SHORT).show();
-                ProgramCounterDialog.this.getDialog().cancel();
+                Toast.makeText(getContext(), "The memory size hasn't been modified", Toast.LENGTH_SHORT).show();
+                MemoryEditDialog.this.getDialog().cancel();
             }
         });
         return builder.create();
     }
 
-    ProgramCounterDialogListener listener;
+    MemoryEditDialog.MemoryEditDialogListener listener;
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         try {
-            listener = (ProgramCounterDialogListener) context;
+            listener = (MemoryEditDialog.MemoryEditDialogListener) context;
         } catch (ClassCastException e) {
             Log.e(getActivity().toString(), e.getMessage());
             throw new ClassCastException(getActivity().toString());
         }
     }
 
-    public interface ProgramCounterDialogListener {
-        void onPositiveClick(DialogFragment dialog, String programCounterValue);
+    public interface MemoryEditDialogListener {
+        void onPositiveClick(DialogFragment dialog, int memorySize);
     }
+
 }

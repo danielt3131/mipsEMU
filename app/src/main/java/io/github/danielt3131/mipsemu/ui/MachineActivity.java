@@ -51,14 +51,14 @@ import io.github.danielt3131.mipsemu.R;
 import io.github.danielt3131.mipsemu.Reference;
 import io.github.danielt3131.mipsemu.machine.MipsMachine;
 
-public class MachineActivity extends AppCompatActivity implements ProgramCounterDialog.ProgramCounterDialogListener{
+public class MachineActivity extends AppCompatActivity implements ProgramCounterDialog.ProgramCounterDialogListener, MemoryEditDialog.MemoryEditDialogListener {
 
     Toolbar machineToolbar;
     Button runOneTime, runMicroStep, runContinously;
     RadioButton decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
     TextView[] registerDisplays;
-    ScrollView memoryScrollView;
+    ScrollView memoryScrollView, registerScrollView;
     private final int FILE_OPEN_REQUEST = 4;
     Uri inputFileUri;
     Uri outputFileUri;
@@ -66,7 +66,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     MachineInterface machineInterface;
     InputStream fileInputStream;
     private boolean gotInputStream = false;
-    private int memorySize = 1000*20;    // Default limit 500 KB
+    private int memorySize = 1000*100;    // Default limit 500 KB
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +97,10 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         instructionDisplay = findViewById(R.id.instructionDisplay);
         cacheHitRateDisplay = findViewById(R.id.cacheHitRate);
 
-        // Set ScrollView
+        // Set ScrollViews
         memoryScrollView = findViewById(R.id.memoryScrollView);
+        registerScrollView = findViewById(R.id.registerScrollView);
+
         // Inflate the registers
         inflateRegisters();
 
@@ -147,19 +149,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         //machineInterface.clearAll();    // Clear the display to display proper register names
         hexMode.setChecked(true);   // Set the default memory display mode to be hex
         mipsMachine.setDisplayFormat(Reference.HEX_MODE);
-        mipsMachine.sendMemory();   // Show blank memory to display
-        mipsMachine.sendAllRegistersToDisplay();
-
-        // Set buttons and checkboxes to their listeners
-        decimalMode.setOnClickListener(decimalModeListener);
-        hexMode.setOnClickListener(hexModeListener);
-        binaryMode.setOnClickListener(binaryModeListener);
-        //memoryDisplay.setMovementMethod(new ScrollingMovementMethod());
-        instructionDisplay.setMovementMethod(new ScrollingMovementMethod());
-        runMicroStep.setOnClickListener(runMicroStepListener);
-        runOneTime.setOnClickListener(runOneStepListener);
-        runContinously.setOnClickListener(runContinuouslyListener);
-
         // From other apps / share menu
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -176,8 +165,23 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-
+        } else {
+            // For creating a new blank machine -> send blank memory and registers
+            mipsMachine.sendMemory();   // Show blank memory to display
+            mipsMachine.sendAllRegistersToDisplay();
         }
+
+        // Set buttons and radio buttons to their listeners
+        decimalMode.setOnClickListener(decimalModeListener);
+        hexMode.setOnClickListener(hexModeListener);
+        binaryMode.setOnClickListener(binaryModeListener);
+        //memoryDisplay.setMovementMethod(new ScrollingMovementMethod());
+        instructionDisplay.setMovementMethod(new ScrollingMovementMethod());
+        runMicroStep.setOnClickListener(runMicroStepListener);
+        runOneTime.setOnClickListener(runOneStepListener);
+        runContinously.setOnClickListener(runContinuouslyListener);
+
+
     }
 
     // Create Mips Machine method
@@ -266,7 +270,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             return true;
         }
         if (item.getItemId() == R.id.machineReset) {
-            resetMachine();
+            resetMachine(true);
             return true;
         }
         if (item.getItemId() == R.id.saveState) {
@@ -276,14 +280,29 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             Intent startCredits = new Intent(MachineActivity.this, CreditsActivity.class);
             startActivity(startCredits);
         }
+        if (item.getItemId() == R.id.scrollTop) {
+            memoryScrollView.fullScroll(View.FOCUS_UP);
+            registerScrollView.fullScroll(View.FOCUS_UP);
+        }
+        if (item.getItemId() == R.id.scrollBottom) {
+            memoryScrollView.fullScroll(View.FOCUS_DOWN);
+            registerScrollView.fullScroll(View.FOCUS_DOWN);
+        }
+        if (item.getItemId() == R.id.setMemorySize) {
+            DialogFragment dialogFragment = new MemoryEditDialog(String.valueOf(memorySize / 1000));
+            dialogFragment.show(getSupportFragmentManager(), "memory");
+        }
         return false;
     }
 
     /**
      * Method to reset the machine
+     * @param resetMemoryDisplay If true then the memory and cache displays will be updated otherwise the memory and register displays will not be updated
      */
-    private void resetMachine() {
-        mipsMachine.onDestroy();    // Ensure that the file streams are closed
+    private void resetMachine(boolean resetMemoryDisplay) {
+        if (gotInputStream) {
+            mipsMachine.onDestroy();    // Ensure that the file streams are closed
+        }
         mipsMachine = null; // Deallocate the object
         System.gc();// Call the garbage collector to clean up mipsMachine
         gotInputStream = false; // Require a new file selection
@@ -292,14 +311,14 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         mipsMachine.setDisplayFormat(getDisplayMode());  // Provide the display mode to the machine
 
-        // Clear the displays
+        // Clear the instruction and cache hit displays
         machineInterface.clearAll();
-
-        // Send the blank memory to be displayed
-        mipsMachine.sendMemory();
-
-        mipsMachine.sendAllRegistersToDisplay();
-
+        if (resetMemoryDisplay) {
+            // Send the blank memory to be displayed
+            mipsMachine.sendMemory();
+            mipsMachine.sendAllRegistersToDisplay();
+        }
+        mipsMachine.sendProgramCounter();
     }
 
     /**
@@ -316,6 +335,11 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         }
     }
 
+    /**
+     * Creates an output stream to save a file in shared storage by using the Storage Access Frameworks
+     * <p>
+     * See <a href="https://developer.android.com/training/data-storage/shared/documents-files">...</a>
+     */
     private void createOutputStream() {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.setType("text/*");
@@ -331,6 +355,9 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
                 try {
                     fileInputStream = getContentResolver().openInputStream(inputFileUri);
                     Log.d("Opening file", "Opened file");
+                    if (gotInputStream) {
+                        resetMachine(false);     // Don't update the memory and register displays to not cause a race condition
+                    }
                     mipsMachine.setInputFileStream(fileInputStream);
                     gotInputStream = true;
                 } catch (FileNotFoundException e) {
@@ -355,7 +382,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         }
     }
     /**
-     * Listeners for all checkboxes
+     * Listeners for all radio buttons
      */
     View.OnClickListener hexModeListener = new View.OnClickListener() {
         @Override
@@ -387,7 +414,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             mipsMachine.sendMemory();
             mipsMachine.sendAllRegistersToDisplay();
             mipsMachine.sendProgramCounter();
-            Toast.makeText(MachineActivity.this, "Now Processing\nThis will take a while", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -406,16 +432,28 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     }
 
     /**
-     * Methods for the clicking buttons
+     * Method interface to get the program counter value from a dialog
+     * @param dialog The dialog
+     * @param memorySize The memory size in KB
      */
+    @Override
+    public void onPositiveClick(DialogFragment dialog, int memorySize) {
+        this.memorySize = memorySize * 1000;    // Kilobytes to bytes
+        resetMachine(true);
+        Log.d("Memory", "Set memory size to " + this.memorySize);
+        Toast.makeText(this, "The memory size is now " + memorySize + "KB", Toast.LENGTH_SHORT).show();
+    }
 
+
+    /**
+     * Click listeners for the run buttons
+     */
     View.OnClickListener runMicroStepListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if (gotInputStream) {
                 // Run microstep
                 mipsMachine.runNextMicroStep();
-                memoryScrollView.fullScroll(View.FOCUS_DOWN);
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }
@@ -428,7 +466,6 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             if (gotInputStream) {
                 // Run one step
                 mipsMachine.runNextStep();
-                memoryScrollView.fullScroll(View.FOCUS_UP);
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }

@@ -149,13 +149,14 @@
             android:layout_height="25dp" />
 
         <ScrollView
+            android:id="@+id/registerScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/programCounterDisplay"
@@ -283,6 +284,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T0" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -294,6 +296,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T1" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -305,6 +308,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T2" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -316,6 +320,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T3" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -327,6 +332,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T4" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -338,6 +344,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T5" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -349,6 +356,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T6" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -360,6 +368,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T7" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -371,6 +380,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T8" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -382,6 +392,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="T9" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -393,6 +404,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S0" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -404,6 +416,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S1" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -415,6 +428,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S2" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -426,6 +440,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S3" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -437,6 +452,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S4" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -448,6 +464,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S5" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -459,6 +476,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S6" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -470,6 +488,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="S7" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -481,6 +500,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="K0" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -492,6 +512,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="K1" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
@@ -503,26 +524,31 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="GP" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
                     android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/register_RA"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="RA" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"
                     android:layout_weight="1" />
+
                 <TextView
                     android:id="@+id/register_AT"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="AT" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="5dp"

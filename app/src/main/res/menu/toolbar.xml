@@ -17,4 +17,19 @@
     <item
         android:id="@+id/creditsOption"
         android:title="Credits" />
+    <item
+        android:id="@+id/scrollOptions"
+        android:title="Scroll">
+        <menu>
+            <item
+                android:id="@+id/scrollTop"
+                android:title="Top" />
+            <item
+                android:id="@+id/scrollBottom"
+                android:title="Bottom" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/setMemorySize"
+        android:title="Set memory amount" />
 </menu>

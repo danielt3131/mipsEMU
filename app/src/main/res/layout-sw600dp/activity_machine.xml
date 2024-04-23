@@ -149,6 +149,7 @@
             android:layout_height="25dp" />
 
         <ScrollView
+            android:id="@+id/registerScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

@@ -105,8 +105,12 @@ public class MipsMachine {
      * Close all file streams for {@link MachineActivity} onDestroy() to prevent resource leak
      */
     public void onDestroy() {
-        fileScanner.close();
-        instructionLogWriter.close();
+        try {
+            fileScanner.close();
+            instructionLogWriter.close();
+        } catch (RuntimeException e) {
+            Log.e("MipsMachine", e.getMessage());
+        }
     }
 
     public void setInputFileStream(InputStream inputFileStream) {
@@ -119,14 +123,15 @@ public class MipsMachine {
                 readState();
                 Toast.makeText(machineContext, "Read in state", Toast.LENGTH_SHORT).show();
                 readFile = true;
-                sendMemory();
             } else {
                 Log.d("inputFileStream Set", "State Header Does Not Exist, readFile()");
                 readFile();
                 readFile = true;
-                sendMemory();
                 Toast.makeText(machineContext, "Read in file", Toast.LENGTH_SHORT).show();
             }
+            sendMemory();
+            sendAllRegistersToDisplay();
+            sendProgramCounter();
             fileScanner.close();
         });
         thread.start();
@@ -189,7 +194,6 @@ public class MipsMachine {
             }
 
         }
-        sendMemory();
     }
 
     /**
@@ -285,9 +289,6 @@ public class MipsMachine {
         {
             memory[memory.length - 1 - i] = fileScanner.nextByte();
         }
-        sendMemory();
-        sendAllRegistersToDisplay();
-        sendProgramCounter();
     }
 
     private int getCode()
