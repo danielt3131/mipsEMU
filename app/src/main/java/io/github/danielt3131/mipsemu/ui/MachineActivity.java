@@ -66,7 +66,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     MachineInterface machineInterface;
     InputStream fileInputStream;
     private boolean gotInputStream = false;
-    private int memorySize = 1000*100;    // Default limit 500 KB
+    private int memorySize = 1000*100;    // Default limit 100 KB
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

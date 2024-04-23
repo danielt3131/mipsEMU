@@ -45,6 +45,7 @@ public class MemoryEditDialog extends DialogFragment {
         builder.setView(view);
         builder.setTitle("Set Machine Memory\nCurrent Value in KB: " + currentMemoryValue);
         EditText text = view.findViewById(R.id.editMemorySize);
+        text.setHint("This will reset the machine");
         builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

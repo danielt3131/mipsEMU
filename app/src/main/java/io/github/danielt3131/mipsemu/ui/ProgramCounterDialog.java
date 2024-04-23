@@ -44,7 +44,7 @@ public class ProgramCounterDialog extends DialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view  = inflater.inflate(R.layout.dialog_programcounter, null);
         builder.setView(view);
-        builder.setTitle("Program Counter Edit: " + programCounterValue);
+        builder.setTitle("Change Program Counter\nCurrent Value: " + programCounterValue);
         EditText text = view.findViewById(R.id.editPCValue);
         builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
             @Override
