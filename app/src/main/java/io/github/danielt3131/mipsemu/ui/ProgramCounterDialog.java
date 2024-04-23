@@ -32,6 +32,10 @@ import androidx.fragment.app.DialogFragment;
 import io.github.danielt3131.mipsemu.R;
 
 public class ProgramCounterDialog extends DialogFragment {
+    private String programCounterValue;
+    public ProgramCounterDialog(String programCounterValue) {
+        this.programCounterValue = programCounterValue;
+    }
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -39,7 +43,7 @@ public class ProgramCounterDialog extends DialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view  = inflater.inflate(R.layout.dialog_programcounter, null);
         builder.setView(view);
-        builder.setTitle("PC Edit");
+        builder.setTitle("Program Counter Edit: " + programCounterValue);
         EditText text = view.findViewById(R.id.editPCValue);
         builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
             @Override

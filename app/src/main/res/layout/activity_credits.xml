@@ -11,7 +11,7 @@
         android:id="@+id/credits_Daniel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Frontend and UI: By Daniel J. Thompson\n\n Alex Garcia: Conditionals, jumps, add, sub, load and save state\n\n Nathan Rowan: XOR\n\n Brennan Azer: Load, Store, and Cache\n\n Louis Daniel Quijano: multiply, and, or"
+        android:text="Frontend and UI: By Daniel J. Thompson\n\n Alex Garcia: Conditionals, jumps, add, sub, load and save state\n\n Nathan Rowan: XOR and NOT\n\n Brennan Azer: Load, Store, and Cache\n\n Louis Daniel Quijano: multiply, and, or"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

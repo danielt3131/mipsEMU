@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,12 +58,15 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
     RadioButton decimalMode, binaryMode, hexMode;
     TextView memoryDisplay, programCounterDisplay, instructionDisplay, cacheHitRateDisplay;
     TextView[] registerDisplays;
+    ScrollView memoryScrollView;
     private final int FILE_OPEN_REQUEST = 4;
-    Uri inputFileUri, outputFileUri;
+    Uri inputFileUri;
+    Uri outputFileUri;
     MipsMachine mipsMachine;
     MachineInterface machineInterface;
     InputStream fileInputStream;
     private boolean gotInputStream = false;
+    private int memorySize = 1000*20;    // Default limit 500 KB
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +97,8 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         instructionDisplay = findViewById(R.id.instructionDisplay);
         cacheHitRateDisplay = findViewById(R.id.cacheHitRate);
 
+        // Set ScrollView
+        memoryScrollView = findViewById(R.id.memoryScrollView);
         // Inflate the registers
         inflateRegisters();
 
@@ -111,16 +117,23 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
 
         // Create Machine interface
         machineInterface = new MachineInterface(memoryDisplay, programCounterDisplay, instructionDisplay, registerDisplays, cacheHitRateDisplay, this);
+
+        // Get the amount of memory available -> Java heap limit
         ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
         activityManager.getMemoryInfo(memoryInfo);
         Log.d("Memory", String.valueOf(memoryInfo.availMem));
         Log.d("Memory", String.valueOf(activityManager.getMemoryClass()));
+
+        // For devices with low memory
+        if (memoryInfo.lowMemory) {
+            memorySize = 1000*50;   // 50 KB
+        }
         // Create the machine
         createMipsMachine();
 
-        if (screenSize >= Configuration.SCREENLAYOUT_SIZE_XLARGE) {
-            memoryDisplay.setTextSize(32);  // Hacky fix for tablets
+        if (screenSize >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+            memoryDisplay.setTextSize(28);  // Hacky fix for tablets
         } else {
             // Screen width
             float screenWidth = getWindowManager().getCurrentWindowMetrics().getBounds().width();
@@ -141,17 +154,44 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         decimalMode.setOnClickListener(decimalModeListener);
         hexMode.setOnClickListener(hexModeListener);
         binaryMode.setOnClickListener(binaryModeListener);
-        memoryDisplay.setMovementMethod(new ScrollingMovementMethod());
+        //memoryDisplay.setMovementMethod(new ScrollingMovementMethod());
         instructionDisplay.setMovementMethod(new ScrollingMovementMethod());
         runMicroStep.setOnClickListener(runMicroStepListener);
         runOneTime.setOnClickListener(runOneStepListener);
         runContinously.setOnClickListener(runContinuouslyListener);
+
+        // From other apps / share menu
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        if (type != null) {
+            Log.d("Intent", type);
+        }
+        if (Intent.ACTION_SEND.equals(action) && "application/txt".equals(type)) {
+            inputFileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            gotInputStream = true;
+            try {
+                fileInputStream = getContentResolver().openInputStream(inputFileUri);
+                mipsMachine.setInputFileStream(fileInputStream);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     }
 
     // Create Mips Machine method
-
     private void createMipsMachine() {
-        mipsMachine = new MipsMachine(1000*100*5, machineInterface);
+        mipsMachine = new MipsMachine(memorySize, machineInterface, this);
+    }
+
+    /**
+     * Destroys the activity
+     */
+    @Override
+    protected void onDestroy() {
+        mipsMachine.onDestroy();    // Ensure that the file streams are closed
+        super.onDestroy();
     }
 
     /**
@@ -221,7 +261,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         }
         if (item.getItemId() == R.id.editPC) {
             // Pull up a dialog box for the user to edit the PC (Program Counter) variable
-            DialogFragment dialogFragment = new ProgramCounterDialog();
+            DialogFragment dialogFragment = new ProgramCounterDialog(String.valueOf(mipsMachine.getProgramCounter()));
             dialogFragment.show(getSupportFragmentManager(), "pc");
             return true;
         }
@@ -243,6 +283,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
      * Method to reset the machine
      */
     private void resetMachine() {
+        mipsMachine.onDestroy();    // Ensure that the file streams are closed
         mipsMachine = null; // Deallocate the object
         System.gc();// Call the garbage collector to clean up mipsMachine
         gotInputStream = false; // Require a new file selection
@@ -303,7 +344,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
                 outputFileUri = data.getData();
                 try {
                     OutputStream outputStream = getContentResolver().openOutputStream(outputFileUri);
-                    mipsMachine.saveState(outputStream);
+                    mipsMachine.saveState(outputStream, outputFileUri, this);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -374,6 +415,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             if (gotInputStream) {
                 // Run microstep
                 mipsMachine.runNextMicroStep();
+                memoryScrollView.fullScroll(View.FOCUS_DOWN);
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }
@@ -386,6 +428,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             if (gotInputStream) {
                 // Run one step
                 mipsMachine.runNextStep();
+                memoryScrollView.fullScroll(View.FOCUS_UP);
             } else {
                 Toast.makeText(MachineActivity.this, "Need file", Toast.LENGTH_SHORT).show();
             }

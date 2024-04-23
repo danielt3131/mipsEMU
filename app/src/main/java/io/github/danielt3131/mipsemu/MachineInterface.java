@@ -68,7 +68,7 @@ public class MachineInterface {
                 //memoryDisplay.append("Memory\n");
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("Memory\n");
-                while (i < memoryArray.length / 4) {
+                while (i < memoryArray.length) {
                     String memoryAddressString =  String.format("0x%6s", Integer.toHexString(memoryAddress)).replace(" ", "0");
                     //memoryDisplay.append(String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]));
                     stringBuilder.append(String.format("%s: %s %s %s %s\n", memoryAddressString, memoryArray[i++], memoryArray[i++], memoryArray[i++], memoryArray[i++]));
@@ -99,7 +99,7 @@ public class MachineInterface {
      * @param programCounter The program counter as a string
      */
     public void updateProgramCounter(String programCounter) {
-        programCounterDisplay.setText("Program Counter: " + programCounter);
+        programCounterDisplay.post(() -> programCounterDisplay.setText("Program Counter: " + programCounter));
     }
 
 
@@ -108,7 +108,7 @@ public class MachineInterface {
      * @param instructions The instructions to display
      */
     public void updateInstructionDisplay(String instructions) {
-        instructionDisplay.setText("Instructions:" + instructions);
+        instructionDisplay.post(() -> instructionDisplay.setText("Instructions:" + instructions));
     }
 
     /**
@@ -117,7 +117,7 @@ public class MachineInterface {
      * @param registerValue The register value
      */
     public void updateIndividualRegister(int register, String registerValue) {
-        registers[register].setText(Reference.registerNames[register] + ": " + registerValue);
+        registers[register].post(() -> registers[register].setText(Reference.registerNames[register] + ": " + registerValue));
         Log.d("Updated Register: " + Reference.registerNames[register], registerValue);
     }
 
@@ -126,14 +126,17 @@ public class MachineInterface {
      * @param registerValues The string array containing the value of every register
      */
     public void updateAllRegisters(String[] registerValues) {
-        for (int i = 0; i < registers.length; i++) {
-            try {
-                registers[i].setText(Reference.registerNames[i] + ": " + registerValues[i]);
-                Log.d("Updated Register: " + Reference.registerNames[i], registerValues[i]);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                Log.e("Update Register", e.getMessage());
+        activity.runOnUiThread(() -> {
+            for (int i = 0; i < registers.length; i++) {
+                try {
+                    registers[i].setText(Reference.registerNames[i] + ": " + registerValues[i]);
+                    Log.d("Updated Register: " + Reference.registerNames[i], registerValues[i]);
+
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    Log.e("Update Register", e.getMessage());
+                }
             }
-        }
+        });
     }
 
     /**
@@ -141,7 +144,7 @@ public class MachineInterface {
      * @param cacheHitRate The cache hit rate value
      */
     public void updateCacheHitDisplay(String cacheHitRate) {
-        cacheHitRateDisplay.setText("Cache Hits: " + cacheHitRate);
+        cacheHitRateDisplay.post(() -> cacheHitRateDisplay.setText("Cache Hits: " + cacheHitRate));
     }
 
     /**
@@ -149,14 +152,16 @@ public class MachineInterface {
      */
     public void clearAll() {
         String blank = "";
+        /*
         String[] blankRegisters = new String[registers.length];
         for (int i = 0; i < blankRegisters.length; i++) {
             blankRegisters[i] = blank;
         }
-        updateAllRegisters(blankRegisters);
+         */
+        //updateAllRegisters(blankRegisters);
         updateProgramCounter(blank);
         updateCacheHitDisplay(blank);
-        updateMemoryDisplay(blank);
+        //updateMemoryDisplay(blank);
         updateInstructionDisplay(blank);
     }
 }

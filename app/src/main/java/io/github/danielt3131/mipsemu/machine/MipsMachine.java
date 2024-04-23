@@ -14,11 +14,23 @@
 
 package io.github.danielt3131.mipsemu.machine;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.sql.Ref;
 import java.util.ArrayList;
@@ -29,6 +41,7 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import io.github.danielt3131.mipsemu.MachineInterface;
+import io.github.danielt3131.mipsemu.R;
 import io.github.danielt3131.mipsemu.Reference;
 import io.github.danielt3131.mipsemu.ui.MachineActivity;
 import kotlin.text.Regex;
@@ -59,30 +72,62 @@ public class MipsMachine {
     private InputStream inputFileStream;
     private int displayFormat;
     private Scanner fileScanner;
+    private PrintWriter instructionLogWriter;
+    private boolean readFile;
+    private Context machineContext;
+    private String instructionLogFilename = "instructions.txt";
 
     /**
      * Constructor for the mips emulator
      *
      * @param memorySize the amount of memory the machine will have in bytes
      */
-    public MipsMachine(int memorySize, MachineInterface machineInterface) {
+    public MipsMachine(int memorySize, MachineInterface machineInterface, Context machineContext) {
 
         memory = new byte[memorySize];
         this.machineInterface = machineInterface;
         mstep = 0;
+        code = 1;
+        readFile = false;
+        this.machineContext = machineContext;
+        try {
+            // Create a Print Writer object to save the instructions to be shared at the end using a buffer writer. -> Stored in internal storage
+            instructionLogWriter = new PrintWriter(new BufferedWriter(new FileWriter(new File(machineContext.getFilesDir(), instructionLogFilename))));
+        } catch (IOException e) {
+            Log.e("Instruction Log", e.getMessage());
+        }
 
+    }
+
+    /**
+     * Close all file streams for {@link MachineActivity} onDestroy() to prevent resource leak
+     */
+    public void onDestroy() {
+        fileScanner.close();
+        instructionLogWriter.close();
     }
 
     public void setInputFileStream(InputStream inputFileStream) {
         this.inputFileStream = inputFileStream;
-        fileScanner = new Scanner(inputFileStream);
-        if (fileScanner.hasNext(Pattern.compile("State.*"))) {
-            Log.d("inputFileStream Set", "State Header Exists, readState()");
-            readState();
-        } else {
-            Log.d("inputFileStream Set", "State Header Does Not Exist, readFile()");
-            readFile();
-        }
+        Thread thread = new Thread(() -> {
+            fileScanner = new Scanner(inputFileStream);
+            Looper.prepare();
+            if (fileScanner.hasNext(Pattern.compile("State.*"))) {
+                Log.d("inputFileStream Set", "State Header Exists, readState()");
+                readState();
+                Toast.makeText(machineContext, "Read in state", Toast.LENGTH_SHORT).show();
+                readFile = true;
+                sendMemory();
+            } else {
+                Log.d("inputFileStream Set", "State Header Does Not Exist, readFile()");
+                readFile();
+                readFile = true;
+                sendMemory();
+                Toast.makeText(machineContext, "Read in file", Toast.LENGTH_SHORT).show();
+            }
+            fileScanner.close();
+        });
+        thread.start();
     }
 
     /**
@@ -240,7 +285,7 @@ public class MipsMachine {
         }
         sendMemory();
         sendAllRegistersToDisplay();
-
+        sendProgramCounter();
     }
 
     private int getCode()
@@ -271,18 +316,30 @@ public class MipsMachine {
      * Method to run the next step as requested from the user or MipsMachine
      */
     public void runNextStep() {
-        nextStep();
-        sendAllRegistersToDisplay();
-        machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        if (readFile && code != 0) {
+            nextStep();
+            sendAllRegistersToDisplay();
+            machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        } else if (code == 0) {
+            showCompletedToast();
+        } else {
+            Toast.makeText(machineContext, "Still reading in the file", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
      * Method to run next micro step as requested from the user or MipsMachine
      */
     public void runNextMicroStep() {
-        nextMicroStep();
-        sendAllRegistersToDisplay();
-        machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        if (readFile && code != 0) {
+            nextMicroStep();
+            sendAllRegistersToDisplay();
+            machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+        } else if (code == 0) {
+            showCompletedToast();
+        } else {
+            Toast.makeText(machineContext, "Still reading in the file", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -291,12 +348,48 @@ public class MipsMachine {
     public void runContinuously() {
         // Run continuously
         // Don't update the memory display
-        while (code != 0) {
-            nextStep();
+        if (readFile && code != 0) {
+            Thread thread = new Thread(() -> {
+                Looper.prepare();
+                while (code != 0) {
+                    nextStep();
+                }
+                showCompletedToast();
+                sendAllRegistersToDisplay();
+                sendMemory();
+                machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+            });
+            thread.start();
         }
-        sendAllRegistersToDisplay();
-        sendMemory();
-        machineInterface.updateCacheHitDisplay(String.valueOf(hitRate()));
+    }
+
+    /**
+     * Shows a Toast message that there is no more instructions to execute
+     * <p>
+     * Calls shareInstructionLog() to share the instruction log to the user
+     */
+    private void showCompletedToast() {
+        Toast.makeText(machineContext, "No more instructions to execute", Toast.LENGTH_LONG).show();
+        shareInstructionLog();
+    }
+
+    /**
+     * Shares the instruction log to the user via the system share sheet via Intent
+     * <p>
+     * See <a href="https://developer.android.com/training/sharing/send">...</a>
+     */
+    private void shareInstructionLog() {
+        instructionLogWriter.close();
+        // Share the instruction log -> pull up share menu
+        Intent instructionShareIntent = new Intent(Intent.ACTION_SEND);
+        // Get a Uri from File
+        Uri instructionUri = FileProvider.getUriForFile(machineContext, "io.github.danielt3131.mipsemu.provider", new File(machineContext.getFilesDir(), instructionLogFilename));
+        instructionShareIntent.setType("text/plain");   // Set the type to a plain text file
+        instructionShareIntent.putExtra(Intent.EXTRA_STREAM, instructionUri);   // The file Uri
+        instructionShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        // Get the share sheet instead of intent resolver see https://developer.android.com/training/sharing/send
+        instructionShareIntent = Intent.createChooser(instructionShareIntent, null);
+        machineContext.startActivity(instructionShareIntent);
     }
 
     private int nextMicroStep() {
@@ -1297,16 +1390,17 @@ public class MipsMachine {
         Log.d("Step", message);
         microStepInstructions = microStepInstructions + "\n" + message;
         machineInterface.updateInstructionDisplay(microStepInstructions);
+        instructionLogWriter.println(microStepInstructions);
     }
 
-    public void saveState(OutputStream outputStream) throws IOException {
+    public void saveState(OutputStream outputStream, Uri outputFileUri, Activity activity) throws IOException {
         // Write header
 //        PrintWriter printWriter = new PrintWriter(outputStream);
 //        printWriter.println("State");
 //        printWriter.close();
         // Save the save
         Log.d("saveState", "Starting to save the state");
-        StateManager.toFile(outputStream, register, pc, hi, lo, memory);
+        StateManager.toFile(outputStream, register, pc, hi, lo, memory, outputFileUri, activity);
     }
 
     /**
