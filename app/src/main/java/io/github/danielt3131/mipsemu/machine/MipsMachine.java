@@ -89,6 +89,8 @@ public class MipsMachine {
         mstep = 0;
         code = 1;
         readFile = false;
+        Log.d("memory siz", "" + (memory.length));
+        register[29] = memory.length - 4;
         this.machineContext = machineContext;
         try {
             // Create a Print Writer object to save the instructions to be shared at the end using a buffer writer. -> Stored in internal storage
@@ -708,53 +710,89 @@ public class MipsMachine {
 
         //I-type instruction
         else {
-            // for load//
+                //load
             if (grabLeftBits(code, 6) == 0b100011) {
+
                 int t = grabRightBits(grabLeftBits(code, 16), 5); //destination
-                int b = grabRightBits(grabLeftBits(code, 11), 5);
-                int o = grabRightBits(code, 16);
-                int address = b + o;
-                int value = combineBytes(memory[address], memory[address + 1], memory[address + 2], memory[address + 3]);
+                int b = grabRightBits(grabLeftBits(code, 11), 5); //base
+                int o = grabRightBits(code, 16); //offset register
+
+
+                if(o >= 0b1000000000000000)
+                {
+                    Log.d("Two Bits Compliment", "making negative");
+                    int mask = 0b11111111111111110000000000000000;
+                    o += mask;
+                }
+
+                Log.d("OFFSET LOAD","" + o);
+
+                int address = register[29] + o;
+                Log.d("ADDRESS LOAD", "" + address);
+                int value = combineBytes(getFromMemory(address), getFromMemory(address + 1), getFromMemory(address + 2), getFromMemory(address + 3));
+
 
                 if (mstep == 0) {
-                    sendToDisplay(String.format(Locale.US, "Grabbing %d from memory %d", value, address));
+                    sendToDisplay(String.format(Locale.US, "Grabbing %d from memory %s", value, Integer.toHexString(address)));
                     mstep++;
                     return 0;
                 } else if (mstep == 1) {
                     sendToDisplay(String.format(Locale.US, "Putting %d to register %s", value, Reference.registerNames[t]));
                     register[t] = value;
-                    mstep = 0;
-                    return EOS;
-                }
-                // Store
+                    mstep ++;
+                    return 0;
+                } else if (mstep == 2){
+                sendToDisplay("Increasing PC by 4");
+                increaseProgramCounter(4);
+                mstep=0;
+                return EOS;
+            }
+                // Store /////////////////////////////////////
             } else if (grabLeftBits(code, 6) == 0b101011) {
                 int s = grabRightBits(grabLeftBits(code, 16), 5); //source
-                int b = grabRightBits(grabLeftBits(code, 11), 5);
-                int o = grabRightBits(code, 16);
-                int address = b + o;
-                int value = combineBytes(memory[address], memory[address + 1], memory[address + 2], memory[address + 3]);
+                int b = grabRightBits(grabLeftBits(code, 11), 5); //base
+                int o = grabRightBits(code, 16); //offset register
+
+                //check offset for two bits compliment
+                if(o >= 0b1000000000000000)
+                {
+                    int mask = 0b11111111111111110000000000000000;
+                    o += mask;
+                }
+
+                Log.d("OFFSET STORE","" + o);
+
+                int address = register[29] + o;
+                Log.d("ADDRESS STORE", "" + address);
 
                 if (mstep == 0) {
-                    sendToDisplay(String.format(Locale.US, "Grabbing %d from memory %d", value, address));
+                    sendToDisplay(String.format(Locale.US, "Grabbing %d from register %s", register[s], Reference.registerNames[s]));
                     mstep++;
                     return 0;
                 } else if (mstep == 1) {
-                    sendToDisplay(String.format(Locale.US, "Putting %d to register %s", value, Reference.registerNames[s]));
+                    sendToDisplay(String.format(Locale.US, "Putting %d into memory %s", register[s], Integer.toHexString(address)));
                     byte p1, p2, p3, p4;
                     p1 = (byte) grabLeftBits(register[s], 8);
                     p2 = (byte) grabRightBits(grabLeftBits(register[s], 16), 8);
-                    p3 = (byte) grabLeftBits(grabRightBits(register[s], 16), 8);
+                    p3 = (byte) grabRightBits(grabLeftBits(register[s], 24), 8);
                     p4 = (byte) grabRightBits(register[s], 8);
 
-                    memory[address] = p1;
-                    memory[address + 1] = p2;
-                    memory[address + 2] = p3;
-                    memory[address + 3] = p4;
+                    sendToMemory(address, p1);
+                    sendToMemory(address + 1, p2);
+                    sendToMemory(address + 2, p3);
+                    sendToMemory(address + 3, p4);
 
-                    mstep = 0;
+
+                    sendMemory();   // Update the memory display -> will take time
+
+                    mstep ++;
+                    return 0;
+                } else if (mstep == 2){
+                    sendToDisplay("Increasing PC by 4");
+                    increaseProgramCounter(4);
+                    mstep=0;
                     return EOS;
                 }
-                sendMemory();   // Update the memory display -> will take time
             }
             //Jump
             else if (grabLeftBits(code, 6) == 0b000010) {
@@ -1032,9 +1070,12 @@ public class MipsMachine {
                 int t = grabRightBits(grabLeftBits(code, 16), 5); //destination
                 int i = grabRightBits(code, 16); //immediate
 
-                if (i >> 15 == 1) {
+                if (i >= 0b1000000000000000) {
+                    Log.d("two bits before", Integer.toBinaryString(i));
+                    Log.d("two bits", "negative");
                     int mask = 0b11111111111111110000000000000000;
                     i += mask;
+                    Log.d("two bits after", Integer.toBinaryString(i));
                 }
 
                 if (mstep == 0) {
@@ -1164,62 +1205,69 @@ public class MipsMachine {
 
     byte getFromMemory(int address)
     {
-        attempts++;
-        hits++;
-
-        int index = address % 8;
-
-        int tag = address/8;
-
-        if (l1[index].isValid() && l1[index].tag == tag) {
-            return l1[index].data;
-        }
-
-        index = address % 16;
-
-        tag = address/16;
-
-        if (l2[index].isValid() && l2[index].tag == tag) {
-            return l2[index].data;
-        }
-
-        index = address % 32;
-
-        tag = address/32;
-
-        if (l3[index].isValid() && l3[index].tag == tag) {
-            return l3[index].data;
-        }
-
-        hits--;
 
         return memory[address];
+
+        //fix later
+//        attempts++;
+//        hits++;
+//
+//        int index = address % 8;
+//
+//        int tag = address/8;
+//
+//        if (l1[index].isValid() && l1[index].tag == tag) {
+//            return l1[index].data;
+//        }
+//
+//        index = address % 16;
+//
+//        tag = address/16;
+//
+//        if (l2[index].isValid() && l2[index].tag == tag) {
+//            return l2[index].data;
+//        }
+//
+//        index = address % 32;
+//
+//        tag = address/32;
+//
+//        if (l3[index].isValid() && l3[index].tag == tag) {
+//            return l3[index].data;
+//        }
+//
+//        hits--;
+//
+//        return memory[address];
     }
 
     void sendToMemory(int address, byte data)
     {
-        int index = address % 8;
-
-        l1[index].tag = address/8;
-        l1[index].data = data;
-
-        l1[index].setValid();
-
-        index = address % 16;
-
-        l2[index].tag = address/16;
-        l2[index].data = data;
-
-        l2[index].setValid();
-
-        index = address % 32;
-
-        l3[index].tag = address/32;
-        l3[index].data = data;
-
-        l3[index].setValid();
-
         memory[address] = data;
+
+
+//        int index = address % 8;
+//
+//        l1[index].tag = address/8;
+//        l1[index].data = data;
+//
+//        l1[index].setValid();
+//
+//        index = address % 16;
+//
+//        l2[index].tag = address/16;
+//        l2[index].data = data;
+//
+//        l2[index].setValid();
+//
+//        index = address % 32;
+//
+//        l3[index].tag = address/32;
+//        l3[index].data = data;
+//
+//        l3[index].setValid();
+//
+//        memory[address] = data;
     }
 
     //HELPER METHODS
@@ -1232,8 +1280,7 @@ public class MipsMachine {
      * @return the grabbed bits
      */
     private int grabRightBits(int data, int n) {
-        int mask = (int) Math.pow(2, n) - 1;
-        return data & mask;
+        return (int) (data % Math.pow(2,n));
     }
 
     /**
@@ -1260,16 +1307,7 @@ public class MipsMachine {
      * @return the combination
      */
     private int combineBytes(byte b1, byte b2, byte b3, byte b4) {
-        int result = 0;
-        result += b1;
-        result = result << 8;
-        result += b2;
-        result = result << 8;
-        result += b3;
-        result = result << 8;
-        result += b4;
-
-        return result;
+        return ((0xFF & b1) << 24) | ((0xFF & b2) << 16) | ((0xFF & b3) << 8) | (0xFF & b4);
     }
 
     /**
@@ -1283,14 +1321,7 @@ public class MipsMachine {
      * @return the combination
      */
     private int combineBytes(byte b1, byte b2, byte b3) {
-        int result = 0;
-        result += b1;
-        result = result << 8;
-        result += b2;
-        result = result << 8;
-        result += b3;
-
-        return result;
+        return combineBytes((byte) 0,b1,b2,b3);
     }
 
     /**
@@ -1303,12 +1334,8 @@ public class MipsMachine {
      * @return the combination
      */
     private int combineBytes(byte b1, byte b2) {
-        int result = 0;
-        result += b1;
-        result = result << 8;
-        result += b2;
 
-        return result;
+        return combineBytes((byte) 0,(byte)0,b1,b2);
     }
 
     /**
@@ -1367,7 +1394,7 @@ public class MipsMachine {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < memory.length; i++) {
             indivByte[0] = memory[i];
-            BigInteger getBinary = new BigInteger(indivByte);
+            BigInteger getBinary = new BigInteger(1,indivByte);
             // Add leading zeros and space -> 00101010 01110001 versus 1010101110001
             stringBuilder.append(String.format("%8s", getBinary.toString(2)).replace(" ", "0")).append(" ");
         }
