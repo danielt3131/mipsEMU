@@ -133,7 +133,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
         }
         // Create the machine
         createMipsMachine();
-
+        /*
         if (screenSize >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
             memoryDisplay.setTextSize(28);  // Hacky fix for tablets
         } else {
@@ -144,6 +144,7 @@ public class MachineActivity extends AppCompatActivity implements ProgramCounter
             // Convert from px to sp (pixels to scaled pixels)
             memoryDisplay.setTextSize(TypedValue.deriveDimension(TypedValue.COMPLEX_UNIT_SP, fontUtils.binaryTextSize(), getResources().getDisplayMetrics()));
         }
+         */
 
         // Init the displays
         //machineInterface.clearAll();    // Clear the display to display proper register names
